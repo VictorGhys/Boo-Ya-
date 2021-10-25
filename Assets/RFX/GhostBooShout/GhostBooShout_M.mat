@@ -1,0 +1,55 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!21 &2100000
+Material:
+  serializedVersion: 6
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: GhostBooShout_M
+  m_Shader: {fileID: -6465566751694194690, guid: 95cce17d9aae0aa44beffac6b361977f, type: 3}
+  m_ShaderKeywords: 
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _SampleTexture2D_2513444a331f454c92090f2398689ce1_Texture_1:
+        m_Texture: {fileID: 2800000, guid: 890d2afe47d79d24490c7f24ad000f39, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _SampleTexture2D_6ddc375e569f41e39993ca28e88be224_Texture_1:
+        m_Texture: {fileID: 2800000, guid: 476becc341adb054e879fc11f1a88ca2, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _SampleTexture2D_9d8fd16948844c4abc19aec878bfefa1_Texture_1:
+        m_Texture: {fileID: 2800000, guid: 890d2afe47d79d24490c7f24ad000f39, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - unity_Lightmaps:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - unity_LightmapsInd:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - unity_ShadowMasks:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Floats:
+    - Vector1_3d9e711477484d03946a8605b6413deb: 1
+    - Vector1_3f4df28cca114ea18414e6f75f3fbc77: 1.89
+    - Vector1_455d1e8c6b234b32b3bbafd75e5b5dcc: 0.12
+    - Vector1_770d63574bcd4d9c846b001d12b3c3cf: 0.5
+    - _Percent: 0.16
+    m_Colors:
+    - Color_ce6b37c9dbad44f1b08d1d07176c60d5: {r: 0.2808697, g: 0.764151, b: 0.09732112, a: 0}
+    - Vector2_881dff8c2ce940e49383ab0f7264364e: {r: 0.5, g: 1, b: 0, a: 0}
+  m_BuildTextureStacks: []

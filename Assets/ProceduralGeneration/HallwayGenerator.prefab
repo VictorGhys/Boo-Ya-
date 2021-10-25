@@ -1,0 +1,91 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &5883847978677291335
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 337842919958247106}
+  - component: {fileID: -4983779515934999320}
+  m_Layer: 0
+  m_Name: HallwayGenerator
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &337842919958247106
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5883847978677291335}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &-4983779515934999320
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5883847978677291335}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: acadd475dd3085149af2a6d009ca8f0a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _seed: 69
+  _generate: 0
+  _minHallwayLength: 4
+  _maxHallwayLength: 12
+  _minHallwayWidth: 2
+  _maxHallwayWidth: 2
+  _minHallwayPieces: 3
+  _maxHallwayPieces: 5
+  _hallwayOffsetChancePercentage: 40
+  _minHallwayOffset: 4
+  _maxHallwayOffset: 8
+  _minHallwayFreeSpaces: 4
+  _maxHallwayFreeSpaces: 8
+  _minRoomLength: 2
+  _maxRoomLength: 5
+  _minRoomWidth: 2
+  _maxRoomWidth: 5
+  _minRooms: 2
+  _maxRooms: 3
+  _pfHallwayFloor: {fileID: 6273898613320993972, guid: f72cde24696458c428336bccf3415005, type: 3}
+  _pfHallwayWall: {fileID: 8973731264468777176, guid: 198473b3e336e174580d64b4e03aec04, type: 3}
+  _pfHallwayInnerCorner: {fileID: 8973731264468777176, guid: 08d367262933ce344b57a7091ee202d9, type: 3}
+  _pfHallwayOuterCorner: {fileID: 8973731264468777176, guid: 7cc3a9262361973449068805dda1aeae, type: 3}
+  _pfHallwayDoorFrame: {fileID: 8973731264468777176, guid: 851806aae25b7e940b8b8a64dc18ac46, type: 3}
+  _pfHallwayWindow: {fileID: 8973731264468777176, guid: d1473f5ea8054ad4ea7948e3458be423, type: 3}
+  _pfRoomFloor: {fileID: 7456415809060358541, guid: 796c696ffbb0b964a8c6b905e8c1947e, type: 3}
+  _pfRoomWall: {fileID: 8973731264468777176, guid: 31c1c7b1c0a38be4c9b732cfef35a452, type: 3}
+  _pfRoomInnerCorner: {fileID: 8973731264468777176, guid: 0729a582082df9b47af756a245700a65, type: 3}
+  _pfRoomOuterCorner: {fileID: 8973731264468777176, guid: 7f95fde586c7f544283267afe03c2efe, type: 3}
+  _pfRoomDoorFrame: {fileID: 8973731264468777176, guid: cb98fab001eda8a42a0275aa33f00bc0, type: 3}
+  _pfRoomWindow: {fileID: 8973731264468777176, guid: c4f7e8b45e04e9640b13e560c1d2f4d2, type: 3}
+  _pfBathroomFloor: {fileID: 6273898613320993972, guid: c3b9e0ddc4a5c9449b05a6ad2075f4f5, type: 3}
+  _pfBathroomWall: {fileID: 8973731264468777176, guid: 9f2316fac56d7a444a891b9904efb043, type: 3}
+  _pfBathroomInnerCorner: {fileID: 8973731264468777176, guid: 8e4aa96d7788ba2468b30c2ffa03ca2d, type: 3}
+  _pfBathroomOuterCorner: {fileID: 8973731264468777176, guid: 87f120079fd34b14eb5246cecb4cc9f7, type: 3}
+  _pfBathroomDoorFrame: {fileID: 8973731264468777176, guid: 190f589b7a0f0904399dc71907847040, type: 3}
+  _pfBathroomWindow: {fileID: 8973731264468777176, guid: f3b1a7472d99ccc44b9c4dc344ed2fc9, type: 3}
+  _pfElevatorFloor: {fileID: 6273898613320993972, guid: e798d856310d24a46a0137e5f020bdec, type: 3}
+  _pfElevatorWall: {fileID: 8973731264468777176, guid: ff85515ee01bfa142a61c37822a8b30a, type: 3}
+  _pfElevatorInnerCorner: {fileID: 8973731264468777176, guid: fed894432a4214240a28e9af1d2ac4bd, type: 3}
+  _pfElevatorOuterCorner: {fileID: 8973731264468777176, guid: 9d0e4143d7b9417439b019ac92663fc0, type: 3}
+  _pfElevatorDoorFrame: {fileID: 8973731264468777176, guid: 625c591d7eacf5e4383255ed4479eb5b, type: 3}
+  _pfElevatorWindow: {fileID: 8973731264468777176, guid: 2a95935ec538c4b42afb135897750d89, type: 3}
+  _pfDoor: {fileID: 4486806066409777285, guid: 4896078f61253144bbfc150e0b967b68, type: 3}
+  _pfCloset: {fileID: 791303070173032632, guid: cc99bac06e70cad46868d9c95dd76ed8, type: 3}
+  doorOffset: 1.73
