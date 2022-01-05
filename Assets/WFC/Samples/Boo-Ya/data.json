@@ -1,0 +1,41 @@
+{
+  "constraints": [
+    {
+      "tile": "empty",
+      "up": [ "empty", "roomwall" ],
+      "down": [ "empty", "roomwall 2" ],
+      "left": [ "empty", "roomwall 1" ],
+      "right": [ "empty", "roomwall 3" ]
+    },
+    {
+      "tile": "roomwall",
+      "up": [ "floor" ],
+      "down": [ "empty" ],
+      "left": [ "floor", "roomwall" ],
+      "right": [ "floor", "roomwall" ]
+    },
+    {
+      "tile": "floor",
+      "up": [ "floor", "roomwall 2" ],
+      "down": [ "floor", "roomwall" ],
+      "left": [ "floor", "roomwall 3" ],
+      "right": [ "floor", "roomwall 1" ]
+    }
+
+  ],
+  "subsets": [
+    {
+      "name": "all",
+      "tiles": [ "empty", "roomwall", "floor" ]
+    },
+    {
+      "name": "allFloors",
+      "tiles": [ "floor" ]
+    },
+    {
+      "name": "allEmpty",
+      "tiles": [ "empty" ]
+    }
+
+  ] 
+}
