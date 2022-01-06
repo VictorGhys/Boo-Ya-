@@ -47,16 +47,16 @@ public class WFCSimpleTiledModel : MonoBehaviour
     private double[] weightLogWeights;
     private double sumOfWeights, sumOfWeightLogWeights, startingEntropy;
     private double[] sumsOfWeights, sumsOfWeightLogWeights, entropies;
-    // Stack
+    // Stack in order: index, tile
     private Tuple<int, int>[] _stack;
     private int _stacksize;
 
     private Subset _currentSubset;
     private int[] _correspondingPrefabTiles;
 
-    static int[] DX = { -1, 0, 1, 0 };
-    static int[] DY = { 0, 1, 0, -1 };
-    static readonly int[] Opposite = { 2, 3, 0, 1 };
+    static int[] XDirectionOffsets = { -1, 0, 1, 0 };
+    static int[] YDirectionOffsets = { 0, 1, 0, -1 };
+    static readonly int[] OppositeDirection = { 2, 3, 0, 1 };
 
     enum Direction : int
     {
@@ -153,10 +153,10 @@ public class WFCSimpleTiledModel : MonoBehaviour
     {
         public string tile;
         public double weight = 1;
-        public string[] up;
-        public string[] down;
         public string[] left;
+        public string[] up;
         public string[] right;
+        public string[] down;
     }
     [Serializable]
     public class Subset
@@ -239,39 +239,11 @@ public class WFCSimpleTiledModel : MonoBehaviour
         {
             _propagator[dir] = new int[_tiles.Count][];
         }
-
-        // Fill it with the constraints
-        //foreach (var constraint in _sampleData.constraints)
-        //{
-        //    int currentIdx = _tiles.FindIndex(tile => tile == constraint.tile);
-        //    foreach (Direction direction in (Direction[]) Enum.GetValues(typeof(Direction)))
-        //    {
-        //        switch (direction)
-        //        {
-        //            case Direction.Left:
-        //                SetAllowedConstraints(constraint.left, direction, currentIdx);
-        //                break;
-        //            case Direction.Up:
-        //                SetAllowedConstraints(constraint.up, direction, currentIdx);
-        //                break;
-        //            case Direction.Right:
-        //                SetAllowedConstraints(constraint.right, direction, currentIdx);
-        //                break;
-        //            case Direction.Down:
-        //                SetAllowedConstraints(constraint.down, direction, currentIdx);
-        //                break;
-        //            default:
-        //                throw new ArgumentOutOfRangeException();
-        //        }
-
-        //    }
-        //}
+        
         _correspondingPrefabTiles = new int[_tiles.Count];
         for(int t = 0; t < _currentSubset.tiles.Length; t++)
         {
             Constraint currentConstraint = _sampleData.constraints.First(c => c.tile == _currentSubset.tiles[t]);
-            //int currentIdx = _tiles.FindIndex(tile => tile == currentConstraint.tile);
-            //_correspondingPrefabTiles[t] = currentIdx;
             _correspondingPrefabTiles[t] = Array.FindIndex(_sampleData.constraints, c => c == currentConstraint); 
             foreach (Direction direction in (Direction[])Enum.GetValues(typeof(Direction)))
             {
@@ -339,10 +311,10 @@ public class WFCSimpleTiledModel : MonoBehaviour
             }
         }
         
-        int chosenIdx = GetWeightedRandom(distribution, _random.NextDouble());
-        // Remove all the other possibilities except the chosen one
+        int chosenPattern = GetWeightedRandom(distribution, _random.NextDouble());
+        // Remove all the other possibilities except the chosen pattern
         for (int tile = 0; tile < _tiles.Count; tile++)
-            if (w[tile] != (tile == chosenIdx))
+            if (w[tile] != (tile == chosenPattern))
                 Ban((int)node, tile);
         return null;
     }
@@ -387,33 +359,33 @@ public class WFCSimpleTiledModel : MonoBehaviour
             var e1 = _stack[_stacksize - 1];
             _stacksize--;
 
-            int i1 = e1.Item1;
-            int x1 = i1 % _width;
-            int y1 = i1 / _width;
-            bool[] w1 = _wave[i1];
+            int idx = e1.Item1;
+            int x = idx % _width;
+            int y = idx / _width;
+            bool[] w1 = _wave[idx];
 
             // Go over all the neighbors
             for (int d = 0; d < 4; d++)
             {
-                int dx = DX[d];
-                int dy = DY[d];
-                int x2 = x1 + dx;
-                int y2 = y1 + dy;
-                if (OnBoundary(x2, y2)) 
+                int xOffset = XDirectionOffsets[d];
+                int yOffset = YDirectionOffsets[d];
+                int xPropagation = x + xOffset;
+                int yPropagation = y + yOffset;
+                if (OnBoundary(xPropagation, yPropagation)) 
                     continue;
 
-                if (x2 < 0) 
-                    x2 += _width;
-                else if (x2 >= _width) 
-                    x2 -= _width;
-                if (y2 < 0) 
-                    y2 += _height;
-                else if (y2 >= _height) 
-                    y2 -= _height;
+                if (xPropagation < 0) 
+                    xPropagation += _width;
+                else if (xPropagation >= _width) 
+                    xPropagation -= _width;
+                if (yPropagation < 0) 
+                    yPropagation += _height;
+                else if (yPropagation >= _height) 
+                    yPropagation -= _height;
 
-                int i2 = x2 + y2 * _width;
+                int idxPropagation = xPropagation + yPropagation * _width;
                 int[] p = _propagator[d][e1.Item2];
-                int[][] compat = _compatible[i2];
+                int[][] compat = _compatible[idxPropagation];
 
                 // Go over all the potentially valid patterns
                 for (int l = 0; l < p.Length; l++)
@@ -424,7 +396,7 @@ public class WFCSimpleTiledModel : MonoBehaviour
                     comp[d]--;
                     // Remove the pattern if it no longer matches
                     if (comp[d] == 0)
-                        Ban(i2, t2);
+                        Ban(idxPropagation, t2);
                 }
             }
         }
@@ -462,7 +434,7 @@ public class WFCSimpleTiledModel : MonoBehaviour
             {
                 _wave[i][tile] = true;
                 for (int dir = 0; dir < 4; dir++)
-                    _compatible[i][tile][dir] = _propagator[Opposite[dir]][tile].Length;
+                    _compatible[i][tile][dir] = _propagator[OppositeDirection[dir]][tile].Length;
             }
             _sumOfPossibilities[i] = _tiles.Count;
             sumsOfWeights[i] = sumOfWeights;
@@ -516,7 +488,7 @@ public class WFCSimpleTiledModel : MonoBehaviour
         GameObject[] observed = new GameObject[_width * _height];
         for (int i = 0; i < _wave.Length; i++)
             for (int t = 0; t < _tiles.Count; t++)
-                if (_wave[i][t])
+                if (_wave[i][t] && _correspondingPrefabTiles[t] != 0)
                 {
                     float x = i % _width;
                     float z = i / _height;
