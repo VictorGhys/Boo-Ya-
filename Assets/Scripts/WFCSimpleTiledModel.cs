@@ -8,7 +8,8 @@ using UnityEngine;
 
 public class WFCSimpleTiledModel : MonoBehaviour
 {
-    [SerializeField, Tooltip("The prefabs of the tiles to place in the level in the same order as defined in data.json")]
+    [SerializeField,
+     Tooltip("The prefabs of the tiles to place in the level in the same order as defined in data.json")]
     private List<GameObject> _tilesPrefabs;
 
     [SerializeField, Tooltip("The gameobject containing the output")]
@@ -22,31 +23,42 @@ public class WFCSimpleTiledModel : MonoBehaviour
 
     [SerializeField, Tooltip("The width of the grid to generate on")]
     private int _width = 10;
+
     [SerializeField, Tooltip("The height of the grid to generate on")]
     private int _height = 10;
+
     [SerializeField, Tooltip("The seed for random generation")]
     private int _seed = 0;
+
     [SerializeField, Tooltip("The limit of iterations to run the algorithm, should be width*height")]
     private int _limit = 100;
 
     private List<string> _tiles = new List<string>();
+
     private WFCSampleData _sampleData;
+
     // Holds the possibilities of tiles of every position on the grid. Indexes in order: Index, Tile
     private bool[][] _wave;
+
     // Holds the constraint rules of which tiles can be next to a tile in every direction. Indexes in order: Direction, Tile, Options
     private int[][][] _propagator;
-    // Indexes in order: Index, Tile, Direction
+
+    // Holds the amount of tiles that are still compatible with this one. Indexes in order: Index, Tile, Direction
     private int[][][] _compatible;
 
     // The random generator for the noise in entropy
     private System.Random _random;
+
     // The number of tiles that are possible at a given index
     private int[] _sumOfPossibilities;
+
     // Weights
     private double[] weights;
     private double[] weightLogWeights;
     private double sumOfWeights, sumOfWeightLogWeights, startingEntropy;
+
     private double[] sumsOfWeights, sumsOfWeightLogWeights, entropies;
+
     // Stack in order: index, tile
     private Tuple<int, int>[] _stack;
     private int _stacksize;
@@ -54,9 +66,12 @@ public class WFCSimpleTiledModel : MonoBehaviour
     private Subset _currentSubset;
     private int[] _correspondingPrefabTiles;
 
-    static int[] XDirectionOffsets = { -1, 0, 1, 0 };
-    static int[] YDirectionOffsets = { 0, 1, 0, -1 };
-    static readonly int[] OppositeDirection = { 2, 3, 0, 1 };
+    static int[] XDirectionOffsets = {-1, 0, 1, 0};
+    static int[] YDirectionOffsets = {0, 1, 0, -1};
+    static readonly int[] OppositeDirection = {2, 3, 0, 1};
+
+
+    private bool Stop = false;
 
     enum Direction : int
     {
@@ -168,11 +183,6 @@ public class WFCSimpleTiledModel : MonoBehaviour
     {
        _sampleData = JsonUtility.FromJson<WFCSampleData>(_json.text);
 
-       //foreach (var constraint in _sampleData.constraints)
-       //{
-       //    _tiles.Add(constraint.tile);
-       //}
-
        _currentSubset = _sampleData.subsets.First(s => s.name == _subsetName);
        if (_currentSubset == null)
        {
@@ -239,7 +249,8 @@ public class WFCSimpleTiledModel : MonoBehaviour
         {
             _propagator[dir] = new int[_tiles.Count][];
         }
-        
+
+        // Fill in the constraints of each tile in the subset
         _correspondingPrefabTiles = new int[_tiles.Count];
         for(int t = 0; t < _currentSubset.tiles.Length; t++)
         {
@@ -292,6 +303,7 @@ public class WFCSimpleTiledModel : MonoBehaviour
         // If FindLowestEntropy returns null the algorithm failed
         if (node == null)
             return false;
+        
         // If FindLowestEntropy returns -1 the algorithm finished
         if (node == -1)
             return true;
@@ -316,6 +328,7 @@ public class WFCSimpleTiledModel : MonoBehaviour
         for (int tile = 0; tile < _tiles.Count; tile++)
             if (w[tile] != (tile == chosenPattern))
                 Ban((int)node, tile);
+        Debug.Log("position: " + node + " is tile " + chosenPattern);
         return null;
     }
 
@@ -330,7 +343,7 @@ public class WFCSimpleTiledModel : MonoBehaviour
                 continue;
 
             int amount = _sumOfPossibilities[i];
-            if (amount == 0) 
+            if (amount == 0)
                 return null;
 
             double entropy = entropies[i];
@@ -346,6 +359,7 @@ public class WFCSimpleTiledModel : MonoBehaviour
         }
         return lowestEntropyIdx;
     }
+
     private bool OnBoundary(int x, int y)
     {
         return x < 0 || y < 0 || x >= _width || y >= _height;
@@ -353,7 +367,7 @@ public class WFCSimpleTiledModel : MonoBehaviour
 
     void Propagate()
     {
-        // Propagate over every cell that needs to be updated
+        // Go over every possibility that has been removed
         while (_stacksize > 0)
         {
             var e1 = _stack[_stacksize - 1];
@@ -387,16 +401,19 @@ public class WFCSimpleTiledModel : MonoBehaviour
                 int[] p = _propagator[d][e1.Item2];
                 int[][] compat = _compatible[idxPropagation];
 
-                // Go over all the potentially valid patterns
+                // Go over all their potentially valid tiles
                 for (int l = 0; l < p.Length; l++)
                 {
                     int t2 = p[l];
                     int[] comp = compat[t2];
 
+                    // Remove one compatibility, because this tile possibility has been banned
                     comp[d]--;
-                    // Remove the pattern if it no longer matches
+                    // Ban the tile if it no longer is compatible with the surrounding tiles
                     if (comp[d] == 0)
                         Ban(idxPropagation, t2);
+                    if(Stop)
+                        return;
                 }
             }
         }
@@ -419,13 +436,49 @@ public class WFCSimpleTiledModel : MonoBehaviour
         entropies[i] += sumsOfWeightLogWeights[i] / sum - Math.Log(sum);
 
         _sumOfPossibilities[i] -= 1;
+        if (_sumOfPossibilities[i] == 0 && !Stop)
+        {
+            Stop = true;
+            DumpWave(i,t);
+        }
         sumsOfWeights[i] -= weights[t];
         sumsOfWeightLogWeights[i] -= weightLogWeights[t];
 
         sum = sumsOfWeights[i];
         entropies[i] -= sumsOfWeightLogWeights[i] / sum - Math.Log(sum);
     }
-    
+
+    private void DumpWave(int idxNoPossibilities, int tile)
+    {
+        for (int idx = 0; idx < _wave.Length; idx++)
+        {
+            if (idx == idxNoPossibilities)
+            {
+                Debug.Log("problem sum of index: " + idxNoPossibilities + " is zero. Was tile " + tile);
+                float x = idxNoPossibilities % _width;
+                float z = idxNoPossibilities / _height;
+                Instantiate(_tilesPrefabs[_correspondingPrefabTiles[tile]],
+                    _output.transform.position + new Vector3(x, 0, z),
+                    Quaternion.identity, _output.transform);
+                continue;
+            }
+            int counter = 0;
+            for (int t = 0; t < _tiles.Count; t++)
+            {
+                if (!_wave[idx][t] && _correspondingPrefabTiles[t] != 0)
+                {
+                    float x = idx % _width;
+                    float z = idx / _height;
+                    Instantiate(_tilesPrefabs[_correspondingPrefabTiles[t]],
+                        _output.transform.position + new Vector3(x, (counter + 1) * 2, z),
+                        Quaternion.identity, _output.transform);
+                    counter++;
+                    //break;
+                }
+            }
+        }
+    }
+
     void Clear()
     {
         for (int i = 0; i < _wave.Length; i++)
