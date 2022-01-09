@@ -39,6 +39,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 3068475999326046934}
     m_Modifications:
+    - target: {fileID: 1117012361476486052, guid: b2374b186b2447b4caf0477ddb3830a7, type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
     - target: {fileID: 5231171197190474172, guid: b2374b186b2447b4caf0477ddb3830a7, type: 3}
       propertyPath: m_RootOrder
       value: 1
@@ -86,6 +90,10 @@ PrefabInstance:
     - target: {fileID: 6863024753473142276, guid: b2374b186b2447b4caf0477ddb3830a7, type: 3}
       propertyPath: m_Name
       value: RoomOuterCornerPiece_PF
+      objectReference: {fileID: 0}
+    - target: {fileID: 6863024753473142276, guid: b2374b186b2447b4caf0477ddb3830a7, type: 3}
+      propertyPath: m_Layer
+      value: 6
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: b2374b186b2447b4caf0477ddb3830a7, type: 3}

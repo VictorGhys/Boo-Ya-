@@ -162,6 +162,7 @@ public class WFCSimpleTiledModel : MonoBehaviour
     {
         public Constraint[] constraints;
         public Subset[] subsets;
+        public Alias[] aliases;
     }
     [Serializable]
     public class Constraint
@@ -179,6 +180,13 @@ public class WFCSimpleTiledModel : MonoBehaviour
         public string name;
         public string[] tiles;
     }
+    [Serializable]
+    public class Alias
+    {
+        public string name;
+        public string[] tiles;
+    }
+
     void PatternsFromJson()
     {
        _sampleData = JsonUtility.FromJson<WFCSampleData>(_json.text);
@@ -258,29 +266,31 @@ public class WFCSimpleTiledModel : MonoBehaviour
             _correspondingPrefabTiles[t] = Array.FindIndex(_sampleData.constraints, c => c == currentConstraint); 
             foreach (Direction direction in (Direction[])Enum.GetValues(typeof(Direction)))
             {
+                List<int> allowedIndexes;
                 switch (direction)
                 {
                     case Direction.Left:
-                        SetAllowedConstraints(currentConstraint.left, direction, t);
+                        allowedIndexes = GetAllowedConstraints(currentConstraint.left, direction, t);
                         break;
                     case Direction.Up:
-                        SetAllowedConstraints(currentConstraint.up, direction, t);
+                        allowedIndexes = GetAllowedConstraints(currentConstraint.up, direction, t);
                         break;
                     case Direction.Right:
-                        SetAllowedConstraints(currentConstraint.right, direction, t);
+                        allowedIndexes = GetAllowedConstraints(currentConstraint.right, direction, t);
                         break;
                     case Direction.Down:
-                        SetAllowedConstraints(currentConstraint.down, direction, t);
+                        allowedIndexes = GetAllowedConstraints(currentConstraint.down, direction, t);
                         break;
                     default:
                         throw new ArgumentOutOfRangeException();
                 }
+                _propagator[(int)direction][t] = allowedIndexes.ToArray();
 
             }
         }
     }
 
-    private void SetAllowedConstraints(string[] constraintArray, Direction direction, int currentIdx)
+    private List<int> GetAllowedConstraints(string[] constraintArray, Direction direction, int currentIdx)
     {
         List<int> allowedIndexes = new List<int>();
         foreach (string s in constraintArray)
@@ -288,13 +298,18 @@ public class WFCSimpleTiledModel : MonoBehaviour
             int allowedIdx = _tiles.FindIndex(tile => tile == s);
             if (allowedIdx < 0)
             {
-                Debug.Log("Can't find tile " + s + " in tiles");
+                Alias foundAlias = _sampleData.aliases.First(alias => alias.name == s);
+                if (foundAlias == null)
+                {
+                    Debug.Log("Can't find tile " + s + " in tiles");
+                    continue;
+                }
+                allowedIndexes.AddRange(GetAllowedConstraints(foundAlias.tiles, direction, currentIdx)); 
                 continue;
             }
             allowedIndexes.Add(allowedIdx);
         }
-
-        _propagator[(int) direction][currentIdx] = allowedIndexes.ToArray();
+        return allowedIndexes;
     }
 
     bool? Observe()
@@ -328,7 +343,7 @@ public class WFCSimpleTiledModel : MonoBehaviour
         for (int tile = 0; tile < _tiles.Count; tile++)
             if (w[tile] != (tile == chosenPattern))
                 Ban((int)node, tile);
-        Debug.Log("position: " + node + " is tile " + chosenPattern);
+        Debug.Log("position: " + node + " is tile " + chosenPattern + " " + _tiles[chosenPattern]);
         return null;
     }
 

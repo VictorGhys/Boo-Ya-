@@ -39,9 +39,17 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 4966471646759942374}
     m_Modifications:
+    - target: {fileID: 3143244113086917244, guid: 0729a582082df9b47af756a245700a65, type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
     - target: {fileID: 4647502064957008666, guid: 0729a582082df9b47af756a245700a65, type: 3}
       propertyPath: m_Name
       value: RoomInnerCornerWall_PF
+      objectReference: {fileID: 0}
+    - target: {fileID: 4647502064957008666, guid: 0729a582082df9b47af756a245700a65, type: 3}
+      propertyPath: m_Layer
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 8973731264468777176, guid: 0729a582082df9b47af756a245700a65, type: 3}
       propertyPath: m_RootOrder
