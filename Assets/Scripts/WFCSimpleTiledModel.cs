@@ -211,44 +211,6 @@ public class WFCSimpleTiledModel : MonoBehaviour
        }
     }
 
-    void PaternsFromXML()
-    {
-        var xdoc = new XmlDocument();
-        xdoc.LoadXml(name);
-        XmlNode xnode = xdoc.FirstChild;
-        xnode = xnode.FirstChild;
-        // Read subset
-        List<string> subsetTiles = null;
-        if (_subsetName != "")
-        {
-            subsetTiles = new List<string>();
-            foreach (XmlNode xsubset in xnode.NextSibling.NextSibling.ChildNodes)
-            {
-                XmlElement subsetElement = xsubset["name"];
-                if (subsetElement == null)
-                    continue;
-
-                if (xsubset.NodeType != XmlNodeType.Comment && subsetElement.Value == _subsetName)
-                    foreach (XmlNode tile in xsubset.ChildNodes)
-                        if(tile["name"] != null)
-                            subsetTiles.Add(tile["name"].Value);
-            }
-        }
-        // Read Symmetry and tiles
-        foreach (XmlNode xtile in xnode.ChildNodes)
-        {
-            if(xtile["name"] == null)
-                continue;
-
-            string tilename = xtile["name"].Value;
-            if (subsetTiles != null && !subsetTiles.Contains(tilename))
-                continue;
-
-            _tiles.Add("0" + tilename);
-        }
-    }
-
-
     void BuildPropagator()
     {
         // Set up propagator
@@ -270,16 +232,16 @@ public class WFCSimpleTiledModel : MonoBehaviour
                 switch (direction)
                 {
                     case Direction.Left:
-                        allowedIndexes = GetAllowedConstraints(currentConstraint.left, direction, t);
+                        allowedIndexes = GetAllowedConstraints(currentConstraint.left);
                         break;
                     case Direction.Up:
-                        allowedIndexes = GetAllowedConstraints(currentConstraint.up, direction, t);
+                        allowedIndexes = GetAllowedConstraints(currentConstraint.up);
                         break;
                     case Direction.Right:
-                        allowedIndexes = GetAllowedConstraints(currentConstraint.right, direction, t);
+                        allowedIndexes = GetAllowedConstraints(currentConstraint.right);
                         break;
                     case Direction.Down:
-                        allowedIndexes = GetAllowedConstraints(currentConstraint.down, direction, t);
+                        allowedIndexes = GetAllowedConstraints(currentConstraint.down);
                         break;
                     default:
                         throw new ArgumentOutOfRangeException();
@@ -290,7 +252,7 @@ public class WFCSimpleTiledModel : MonoBehaviour
         }
     }
 
-    private List<int> GetAllowedConstraints(string[] constraintArray, Direction direction, int currentIdx)
+    private List<int> GetAllowedConstraints(string[] constraintArray)
     {
         List<int> allowedIndexes = new List<int>();
         foreach (string s in constraintArray)
@@ -298,13 +260,13 @@ public class WFCSimpleTiledModel : MonoBehaviour
             int allowedIdx = _tiles.FindIndex(tile => tile == s);
             if (allowedIdx < 0)
             {
-                Alias foundAlias = _sampleData.aliases.First(alias => alias.name == s);
+                Alias foundAlias = _sampleData.aliases.FirstOrDefault(alias => alias.name == s);
                 if (foundAlias == null)
                 {
                     Debug.Log("Can't find tile " + s + " in tiles");
                     continue;
                 }
-                allowedIndexes.AddRange(GetAllowedConstraints(foundAlias.tiles, direction, currentIdx)); 
+                allowedIndexes.AddRange(GetAllowedConstraints(foundAlias.tiles)); 
                 continue;
             }
             allowedIndexes.Add(allowedIdx);
@@ -386,6 +348,7 @@ public class WFCSimpleTiledModel : MonoBehaviour
         while (_stacksize > 0)
         {
             var e1 = _stack[_stacksize - 1];
+            //Debug.Log("Last propagation idx: " + e1.Item1 + " tile: " + e1.Item2 + " " + _tiles[e1.Item2]);
             _stacksize--;
 
             int idx = e1.Item1;
