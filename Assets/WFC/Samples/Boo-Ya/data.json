@@ -2,10 +2,10 @@
   "constraints": [
     {
       "tile": "empty",
-      "left": [ "empty", "roomwall 1", "roominnercorner 1", "roominnercorner 2" ],
-      "up": [ "empty", "roomwall", "roominnercorner", "roominnercorner 1" ],
-      "right": [ "empty", "roomwall 3", "roominnercorner", "roominnercorner 3" ],
-      "down": [ "empty", "roomwall 2", "roominnercorner 2", "roominnercorner 3" ]
+      "left": [ "empty", "outsidewall 3", "outsideoutercorner", "outsideoutercorner 3" ],
+      "up": [ "empty", "outsidewall 2", "outsideoutercorner 2", "outsideoutercorner 3" ],
+      "right": [ "empty", "outsidewall 1", "outsideoutercorner 1", "outsideoutercorner 2" ],
+      "down": [ "empty", "outsidewall", "outsideoutercorner", "outsideoutercorner 1" ]
     },
     {
       "tile": "roomfloor",
@@ -100,7 +100,7 @@
     },
     {
       "tile": "roomdoorleft",
-      "left": [ "roomwall", "roominnercorner"],
+      "left": [ "roomwall", "roominnercorner" ],
       "up": [ "roomfloor" ],
       "right": [ "roomdoorright" ],
       "down": [ "doorleftwildcarddown" ]
@@ -110,19 +110,19 @@
       "left": [ "roomfloor" ],
       "up": [ "roomdoorright 1" ],
       "right": [ "doorleftwildcardright" ],
-      "down": [ "roomwall 1", "roominnercorner 1"]
+      "down": [ "roomwall 1", "roominnercorner 1" ]
     },
     {
       "tile": "roomdoorleft 2",
       "left": [ "roomdoorright 2" ],
       "up": [ "doorleftwildcardup" ],
-      "right": [ "roomwall 2", "roominnercorner 2"],
+      "right": [ "roomwall 2", "roominnercorner 2" ],
       "down": [ "roomfloor" ]
     },
     {
       "tile": "roomdoorleft 3",
       "left": [ "doorleftwildcardleft" ],
-      "up": [ "roomwall 3", "roominnercorner 3"],
+      "up": [ "roomwall 3", "roominnercorner 3" ],
       "right": [ "roomfloor" ],
       "down": [ "roomdoorright 3" ]
     },
@@ -130,19 +130,19 @@
       "tile": "roomdoorright",
       "left": [ "roomdoorleft" ],
       "up": [ "roomfloor" ],
-      "right": [ "roomwall", "roominnercorner 1"],
+      "right": [ "roomwall", "roominnercorner 1" ],
       "down": [ "doorrightwildcarddown" ]
     },
     {
       "tile": "roomdoorright 1",
       "left": [ "roomfloor" ],
-      "up": [ "roomwall 1", "roominnercorner 2"],
+      "up": [ "roomwall 1", "roominnercorner 2" ],
       "right": [ "doorrightwildcardright" ],
       "down": [ "roomdoorleft 1" ]
     },
     {
       "tile": "roomdoorright 2",
-      "left": [ "roomwall 2", "roominnercorner 3"],
+      "left": [ "roomwall 2", "roominnercorner 3" ],
       "up": [ "doorrightwildcardup" ],
       "right": [ "roomdoorleft 2" ],
       "down": [ "roomfloor" ]
@@ -152,9 +152,8 @@
       "left": [ "doorrightwildcardleft" ],
       "up": [ "roomdoorleft 3" ],
       "right": [ "roomfloor" ],
-      "down": [ "roomwall 3", "roominnercorner"]
-    }
-    ,
+      "down": [ "roomwall 3", "roominnercorner" ]
+    },
     {
       "tile": "hallwayfloor",
       "left": [ "hallwayfloor", "hallwaywall 3", "hallwayoutercorner", "hallwayoutercorner 3", "hallwaydoorleft 3", "hallwaydoorright 3" ],
@@ -248,7 +247,7 @@
     },
     {
       "tile": "hallwaydoorleft",
-      "left": [ "hallwaywall", "hallwayinnercorner"],
+      "left": [ "hallwaywall", "hallwayinnercorner" ],
       "up": [ "hallwayfloor" ],
       "right": [ "hallwaydoorright" ],
       "down": [ "doorleftwildcarddown" ]
@@ -258,19 +257,19 @@
       "left": [ "hallwayfloor" ],
       "up": [ "hallwaydoorright 1" ],
       "right": [ "doorleftwildcardright" ],
-      "down": [ "hallwaywall 1", "hallwayinnercorner 1"]
+      "down": [ "hallwaywall 1", "hallwayinnercorner 1" ]
     },
     {
       "tile": "hallwaydoorleft 2",
       "left": [ "hallwaydoorright 2" ],
       "up": [ "doorleftwildcardup" ],
-      "right": [ "hallwaywall 2", "hallwayinnercorner 2"],
+      "right": [ "hallwaywall 2", "hallwayinnercorner 2" ],
       "down": [ "hallwayfloor" ]
     },
     {
       "tile": "hallwaydoorleft 3",
       "left": [ "doorleftwildcardleft" ],
-      "up": [ "hallwaywall 3", "hallwayinnercorner 3"],
+      "up": [ "hallwaywall 3", "hallwayinnercorner 3" ],
       "right": [ "hallwayfloor" ],
       "down": [ "hallwaydoorright 3" ]
     },
@@ -278,19 +277,19 @@
       "tile": "hallwaydoorright",
       "left": [ "hallwaydoorleft" ],
       "up": [ "hallwayfloor" ],
-      "right": [ "hallwaywall", "hallwayinnercorner 1"],
+      "right": [ "hallwaywall", "hallwayinnercorner 1" ],
       "down": [ "doorrightwildcarddown" ]
     },
     {
       "tile": "hallwaydoorright 1",
       "left": [ "hallwayfloor" ],
-      "up": [ "hallwaywall 1", "hallwayinnercorner 2"],
+      "up": [ "hallwaywall 1", "hallwayinnercorner 2" ],
       "right": [ "doorrightwildcardright" ],
       "down": [ "hallwaydoorleft 1" ]
     },
     {
       "tile": "hallwaydoorright 2",
-      "left": [ "hallwaywall 2", "hallwayinnercorner 3"],
+      "left": [ "hallwaywall 2", "hallwayinnercorner 3" ],
       "up": [ "doorrightwildcardup" ],
       "right": [ "hallwaydoorleft 2" ],
       "down": [ "hallwayfloor" ]
@@ -300,18 +299,336 @@
       "left": [ "doorrightwildcardleft" ],
       "up": [ "hallwaydoorleft 3" ],
       "right": [ "hallwayfloor" ],
-      "down": [ "hallwaywall 3", "hallwayinnercorner"]
+      "down": [ "hallwaywall 3", "hallwayinnercorner" ]
+    },
+    {
+      "tile": "bathroomfloor",
+      "left": [ "bathroomfloor", "bathroomwall 3", "bathroomdoorleft 3", "bathroomdoorright 3" ],
+      "up": [ "bathroomfloor", "bathroomwall 2", "bathroomdoorleft 2", "bathroomdoorright 2" ],
+      "right": [ "bathroomfloor", "bathroomwall 1", "bathroomdoorleft 1", "bathroomdoorright 1" ],
+      "down": [ "bathroomfloor", "bathroomwall", "bathroomdoorleft", "bathroomdoorright" ]
+    },
+    {
+      "tile": "bathroomwall",
+      "left": [ "bathroomwall", "bathroominnercorner", "bathroomdoorright" ],
+      "up": [ "bathroomfloor" ],
+      "right": [ "bathroomwall", "bathroominnercorner 1", "bathroomdoorleft" ],
+      "down": [ "wildcarddown" ]
+    },
+    {
+      "tile": "bathroomwall 1",
+      "left": [ "bathroomfloor" ],
+      "up": [ "bathroomwall 1", "bathroominnercorner 2", "bathroomdoorleft 1" ],
+      "right": [ "wildcardright" ],
+      "down": [ "bathroomwall 1", "bathroominnercorner 1", "bathroomdoorright 1" ]
+    },
+    {
+      "tile": "bathroomwall 2",
+      "left": [ "bathroomwall 2", "bathroominnercorner 3", "bathroomdoorleft 2" ],
+      "up": [ "wildcardup" ],
+      "right": [ "bathroomwall 2", "bathroominnercorner 2", "bathroomdoorright 2" ],
+      "down": [ "bathroomfloor" ]
+    },
+    {
+      "tile": "bathroomwall 3",
+      "left": [ "wildcardleft" ],
+      "up": [ "bathroomwall 3", "bathroominnercorner 3", "bathroomdoorright 3" ],
+      "right": [ "bathroomfloor" ],
+      "down": [ "bathroomwall 3", "bathroominnercorner", "bathroomdoorleft 3" ]
+    },
+    {
+      "tile": "bathroominnercorner",
+      "left": [ "wildcardleft" ],
+      "up": [ "bathroomwall 3", "bathroomdoorright 3" ],
+      "right": [ "bathroomwall", "bathroomdoorleft" ],
+      "down": [ "wildcarddown" ]
+    },
+    {
+      "tile": "bathroominnercorner 1",
+      "left": [ "bathroomwall", "bathroomdoorright" ],
+      "up": [ "bathroomwall 1", "bathroomdoorleft 1" ],
+      "right": [ "wildcardright" ],
+      "down": [ "wildcarddown" ]
+    },
+    {
+      "tile": "bathroominnercorner 2",
+      "left": [ "bathroomwall 2", "bathroomdoorleft 2" ],
+      "up": [ "wildcardup" ],
+      "right": [ "wildcardright" ],
+      "down": [ "bathroomwall 1", "bathroomdoorright 1" ]
+    },
+    {
+      "tile": "bathroominnercorner 3",
+      "left": [ "wildcardleft" ],
+      "up": [ "wildcardup" ],
+      "right": [ "bathroomwall 2", "bathroomdoorright 2" ],
+      "down": [ "bathroomwall 3", "bathroomdoorleft 3" ]
+    },
+    {
+      "tile": "bathroomdoorleft",
+      "left": [ "bathroomwall", "bathroominnercorner" ],
+      "up": [ "bathroomfloor" ],
+      "right": [ "bathroomdoorright" ],
+      "down": [ "doorleftwildcarddown" ]
+    },
+    {
+      "tile": "bathroomdoorleft 1",
+      "left": [ "bathroomfloor" ],
+      "up": [ "bathroomdoorright 1" ],
+      "right": [ "doorleftwildcardright" ],
+      "down": [ "bathroomwall 1", "bathroominnercorner 1" ]
+    },
+    {
+      "tile": "bathroomdoorleft 2",
+      "left": [ "bathroomdoorright 2" ],
+      "up": [ "doorleftwildcardup" ],
+      "right": [ "bathroomwall 2", "bathroominnercorner 2" ],
+      "down": [ "bathroomfloor" ]
+    },
+    {
+      "tile": "bathroomdoorleft 3",
+      "left": [ "doorleftwildcardleft" ],
+      "up": [ "bathroomwall 3", "bathroominnercorner 3" ],
+      "right": [ "bathroomfloor" ],
+      "down": [ "bathroomdoorright 3" ]
+    },
+    {
+      "tile": "bathroomdoorright",
+      "left": [ "bathroomdoorleft" ],
+      "up": [ "bathroomfloor" ],
+      "right": [ "bathroomwall", "bathroominnercorner 1" ],
+      "down": [ "doorrightwildcarddown" ]
+    },
+    {
+      "tile": "bathroomdoorright 1",
+      "left": [ "bathroomfloor" ],
+      "up": [ "bathroomwall 1", "bathroominnercorner 2" ],
+      "right": [ "doorrightwildcardright" ],
+      "down": [ "bathroomdoorleft 1" ]
+    },
+    {
+      "tile": "bathroomdoorright 2",
+      "left": [ "bathroomwall 2", "bathroominnercorner 3" ],
+      "up": [ "doorrightwildcardup" ],
+      "right": [ "bathroomdoorleft 2" ],
+      "down": [ "bathroomfloor" ]
+    },
+    {
+      "tile": "bathroomdoorright 3",
+      "left": [ "doorrightwildcardleft" ],
+      "up": [ "bathroomdoorleft 3" ],
+      "right": [ "bathroomfloor" ],
+      "down": [ "bathroomwall 3", "bathroominnercorner" ]
+    },
+    {
+      "tile": "elevatorfloor",
+      "left": [ "elevatorfloor", "elevatorwall 3", "elevatordoorleft 3", "elevatordoorright 3" ],
+      "up": [ "elevatorfloor", "elevatorwall 2", "elevatordoorleft 2", "elevatordoorright 2" ],
+      "right": [ "elevatorfloor", "elevatorwall 1", "elevatordoorleft 1", "elevatordoorright 1" ],
+      "down": [ "elevatorfloor", "elevatorwall", "elevatordoorleft", "elevatordoorright" ]
+    },
+    {
+      "tile": "elevatorwall",
+      "left": [ "elevatorwall", "elevatorinnercorner", "elevatordoorright" ],
+      "up": [ "elevatorfloor" ],
+      "right": [ "elevatorwall", "elevatorinnercorner 1", "elevatordoorleft" ],
+      "down": [ "wildcarddown" ]
+    },
+    {
+      "tile": "elevatorwall 1",
+      "left": [ "elevatorfloor" ],
+      "up": [ "elevatorwall 1", "elevatorinnercorner 2", "elevatordoorleft 1" ],
+      "right": [ "wildcardright" ],
+      "down": [ "elevatorwall 1", "elevatorinnercorner 1", "elevatordoorright 1" ]
+    },
+    {
+      "tile": "elevatorwall 2",
+      "left": [ "elevatorwall 2", "elevatorinnercorner 3", "elevatordoorleft 2" ],
+      "up": [ "wildcardup" ],
+      "right": [ "elevatorwall 2", "elevatorinnercorner 2", "elevatordoorright 2" ],
+      "down": [ "elevatorfloor" ]
+    },
+    {
+      "tile": "elevatorwall 3",
+      "left": [ "wildcardleft" ],
+      "up": [ "elevatorwall 3", "elevatorinnercorner 3", "elevatordoorright 3" ],
+      "right": [ "elevatorfloor" ],
+      "down": [ "elevatorwall 3", "elevatorinnercorner", "elevatordoorleft 3" ]
+    },
+    {
+      "tile": "elevatorinnercorner",
+      "left": [ "wildcardleft" ],
+      "up": [ "elevatorwall 3", "elevatordoorright 3" ],
+      "right": [ "elevatorwall", "elevatordoorleft" ],
+      "down": [ "wildcarddown" ]
+    },
+    {
+      "tile": "elevatorinnercorner 1",
+      "left": [ "elevatorwall", "elevatordoorright" ],
+      "up": [ "elevatorwall 1", "elevatordoorleft 1" ],
+      "right": [ "wildcardright" ],
+      "down": [ "wildcarddown" ]
+    },
+    {
+      "tile": "elevatorinnercorner 2",
+      "left": [ "elevatorwall 2", "elevatordoorleft 2" ],
+      "up": [ "wildcardup" ],
+      "right": [ "wildcardright" ],
+      "down": [ "elevatorwall 1", "elevatordoorright 1" ]
+    },
+    {
+      "tile": "elevatorinnercorner 3",
+      "left": [ "wildcardleft" ],
+      "up": [ "wildcardup" ],
+      "right": [ "elevatorwall 2", "elevatordoorright 2" ],
+      "down": [ "elevatorwall 3", "elevatordoorleft 3" ]
+    },
+    {
+      "tile": "elevatordoorleft",
+      "left": [ "elevatorwall", "elevatorinnercorner" ],
+      "up": [ "elevatorfloor" ],
+      "right": [ "elevatordoorright" ],
+      "down": [ "doorleftwildcarddown" ]
+    },
+    {
+      "tile": "elevatordoorleft 1",
+      "left": [ "elevatorfloor" ],
+      "up": [ "elevatordoorright 1" ],
+      "right": [ "doorleftwildcardright" ],
+      "down": [ "elevatorwall 1", "elevatorinnercorner 1" ]
+    },
+    {
+      "tile": "elevatordoorleft 2",
+      "left": [ "elevatordoorright 2" ],
+      "up": [ "doorleftwildcardup" ],
+      "right": [ "elevatorwall 2", "elevatorinnercorner 2" ],
+      "down": [ "elevatorfloor" ]
+    },
+    {
+      "tile": "elevatordoorleft 3",
+      "left": [ "doorleftwildcardleft" ],
+      "up": [ "elevatorwall 3", "elevatorinnercorner 3" ],
+      "right": [ "elevatorfloor" ],
+      "down": [ "elevatordoorright 3" ]
+    },
+    {
+      "tile": "elevatordoorright",
+      "left": [ "elevatordoorleft" ],
+      "up": [ "elevatorfloor" ],
+      "right": [ "elevatorwall", "elevatorinnercorner 1" ],
+      "down": [ "doorrightwildcarddown" ]
+    },
+    {
+      "tile": "elevatordoorright 1",
+      "left": [ "elevatorfloor" ],
+      "up": [ "elevatorwall 1", "elevatorinnercorner 2" ],
+      "right": [ "doorrightwildcardright" ],
+      "down": [ "elevatordoorleft 1" ]
+    },
+    {
+      "tile": "elevatordoorright 2",
+      "left": [ "elevatorwall 2", "elevatorinnercorner 3" ],
+      "up": [ "doorrightwildcardup" ],
+      "right": [ "elevatordoorleft 2" ],
+      "down": [ "elevatorfloor" ]
+    },
+    {
+      "tile": "elevatordoorright 3",
+      "left": [ "doorrightwildcardleft" ],
+      "up": [ "elevatordoorleft 3" ],
+      "right": [ "elevatorfloor" ],
+      "down": [ "elevatorwall 3", "elevatorinnercorner" ]
+    },
+    {
+      "tile": "outsidewall",
+      "left": [ "outsidewall", "outsideinnercorner", "outsideoutercorner 1" ],
+      "up": [ "empty" ],
+      "right": [ "outsidewall", "outsideinnercorner 1", "outsideoutercorner" ],
+      "down": [ "wildcarddown" ]
+    },
+    {
+      "tile": "outsidewall 1",
+      "left": [ "empty" ],
+      "up": [ "outsidewall 1", "outsideinnercorner 2", "outsideoutercorner 1" ],
+      "right": [ "wildcardright" ],
+      "down": [ "outsidewall 1", "outsideinnercorner 1", "outsideoutercorner 2" ]
+    },
+    {
+      "tile": "outsidewall 2",
+      "left": [ "outsidewall 2", "outsideinnercorner 3", "outsideoutercorner 2" ],
+      "up": [ "wildcardup" ],
+      "right": [ "outsidewall 2", "outsideinnercorner 2", "outsideoutercorner 3" ],
+      "down": [ "empty" ]
+    },
+    {
+      "tile": "outsidewall 3",
+      "left": [ "wildcardleft" ],
+      "up": [ "outsidewall 3", "outsideinnercorner 3", "outsideoutercorner" ],
+      "right": [ "empty" ],
+      "down": [ "outsidewall 3", "outsideinnercorner", "outsideoutercorner 3" ]
+    },
+    {
+      "tile": "outsideinnercorner",
+      "left": [ "wildcardleft" ],
+      "up": [ "outsidewall 3" ],
+      "right": [ "outsidewall" ],
+      "down": [ "wildcarddown" ]
+    },
+    {
+      "tile": "outsideinnercorner 1",
+      "left": [ "outsidewall" ],
+      "up": [ "outsidewall 1" ],
+      "right": [ "wildcardright" ],
+      "down": [ "wildcarddown" ]
+    },
+    {
+      "tile": "outsideinnercorner 2",
+      "left": [ "outsidewall 2" ],
+      "up": [ "wildcardup" ],
+      "right": [ "wildcardright" ],
+      "down": [ "outsidewall 1" ]
+    },
+    {
+      "tile": "outsideinnercorner 3",
+      "left": [ "wildcardleft" ],
+      "up": [ "wildcardup" ],
+      "right": [ "outsidewall 2" ],
+      "down": [ "outsidewall 3" ]
+    },
+    {
+      "tile": "outsideoutercorner",
+      "left": [ "outsidewall" ],
+      "up": [ "empty" ],
+      "right": [ "empty" ],
+      "down": [ "outsidewall 3" ]
+    },
+    {
+      "tile": "outsideoutercorner 1",
+      "left": [ "empty" ],
+      "up": [ "empty" ],
+      "right": [ "outsidewall" ],
+      "down": [ "outsidewall 1" ]
+    },
+    {
+      "tile": "outsideoutercorner 2",
+      "left": [ "empty" ],
+      "up": [ "outsidewall 1" ],
+      "right": [ "outsidewall 2" ],
+      "down": [ "empty" ]
+    },
+    {
+      "tile": "outsideoutercorner 3",
+      "left": [ "outsidewall 2" ],
+      "up": [ "outsidewall 3" ],
+      "right": [ "empty" ],
+      "down": [ "empty" ]
     }
-
   ],
   "subsets": [
     {
       "name": "all",
-      "tiles": [ "empty", "roomfloor", "roomwall", "roomwall 1", "roomwall 2", "roomwall 3", "roominnercorner", "roominnercorner 1", "roominnercorner 2", "roominnercorner 3", "roomoutercorner", "roomoutercorner 1", "roomoutercorner 2", "roomoutercorner 3", "roomdoorleft", "roomdoorleft 1", "roomdoorleft 2", "roomdoorleft 3", "roomdoorright", "roomdoorright 1", "roomdoorright 2", "roomdoorright 3" ]
-    },
-    {
-      "name": "noEmpty",
       "tiles": [
+        "empty",
         "roomfloor",
         "roomwall",
         "roomwall 1",
@@ -353,8 +670,53 @@
         "hallwaydoorright",
         "hallwaydoorright 1",
         "hallwaydoorright 2",
-        "hallwaydoorright 3"
-
+        "hallwaydoorright 3",
+        "bathroomfloor",
+        "bathroomwall",
+        "bathroomwall 1",
+        "bathroomwall 2",
+        "bathroomwall 3",
+        "bathroominnercorner",
+        "bathroominnercorner 1",
+        "bathroominnercorner 2",
+        "bathroominnercorner 3",
+        "bathroomdoorleft",
+        "bathroomdoorleft 1",
+        "bathroomdoorleft 2",
+        "bathroomdoorleft 3",
+        "bathroomdoorright",
+        "bathroomdoorright 1",
+        "bathroomdoorright 2",
+        "bathroomdoorright 3",
+        "elevatorfloor",
+        "elevatorwall",
+        "elevatorwall 1",
+        "elevatorwall 2",
+        "elevatorwall 3",
+        "elevatorinnercorner",
+        "elevatorinnercorner 1",
+        "elevatorinnercorner 2",
+        "elevatorinnercorner 3",
+        "elevatordoorleft",
+        "elevatordoorleft 1",
+        "elevatordoorleft 2",
+        "elevatordoorleft 3",
+        "elevatordoorright",
+        "elevatordoorright 1",
+        "elevatordoorright 2",
+        "elevatordoorright 3",
+        "outsidewall",
+        "outsidewall 1",
+        "outsidewall 2",
+        "outsidewall 3",
+        "outsideinnercorner",
+        "outsideinnercorner 1",
+        "outsideinnercorner 2",
+        "outsideinnercorner 3",
+        "outsideoutercorner",
+        "outsideoutercorner 1",
+        "outsideoutercorner 2",
+        "outsideoutercorner 3"
       ]
     },
     {
@@ -456,51 +818,51 @@
   "aliases": [
     {
       "name": "wildcardleft",
-      "tiles": [ "roomwall 1", "roominnercorner 1", "roominnercorner 2", "hallwaywall 1", "hallwayinnercorner 1", "hallwayinnercorner 2" ]
+      "tiles": [ "roomwall 1", "roominnercorner 1", "roominnercorner 2", "hallwaywall 1", "hallwayinnercorner 1", "hallwayinnercorner 2", "bathroomwall 1", "bathroominnercorner 1", "bathroominnercorner 2", "elevatorwall 1", "elevatorinnercorner 1", "elevatorinnercorner 2", "outsidewall 1", "outsideinnercorner 1", "outsideinnercorner 2" ]
     },
     {
       "name": "wildcardup",
-      "tiles": [ "roomwall", "roominnercorner", "roominnercorner 1", "hallwaywall", "hallwayinnercorner", "hallwayinnercorner 1" ]
+      "tiles": [ "roomwall", "roominnercorner", "roominnercorner 1", "hallwaywall", "hallwayinnercorner", "hallwayinnercorner 1", "bathroomwall", "bathroominnercorner", "bathroominnercorner 1", "elevatorwall", "elevatorinnercorner", "elevatorinnercorner 1", "outsidewall", "outsideinnercorner", "outsideinnercorner 1" ]
     },
     {
       "name": "wildcardright",
-      "tiles": [ "roomwall 3", "roominnercorner", "roominnercorner 3", "hallwaywall 3", "hallwayinnercorner", "hallwayinnercorner 3" ]
+      "tiles": [ "roomwall 3", "roominnercorner", "roominnercorner 3", "hallwaywall 3", "hallwayinnercorner", "hallwayinnercorner 3", "bathroomwall 3", "bathroominnercorner", "bathroominnercorner 3", "elevatorwall 3", "elevatorinnercorner", "elevatorinnercorner 3", "outsidewall 3", "outsideinnercorner", "outsideinnercorner 3" ]
     },
     {
       "name": "wildcarddown",
-      "tiles": [ "roomwall 2", "roominnercorner 2", "roominnercorner 3", "hallwaywall 2", "hallwayinnercorner 2", "hallwayinnercorner 3" ]
+      "tiles": [ "roomwall 2", "roominnercorner 2", "roominnercorner 3", "hallwaywall 2", "hallwayinnercorner 2", "hallwayinnercorner 3", "bathroomwall 2", "bathroominnercorner 2", "bathroominnercorner 3", "elevatorwall 2", "elevatorinnercorner 2", "elevatorinnercorner 3", "outsidewall 2", "outsideinnercorner 2", "outsideinnercorner 3" ]
     },
     {
       "name": "doorleftwildcardleft",
-      "tiles": [ "roomdoorright 1", "hallwaydoorright 1" ]
+      "tiles": [ "roomdoorright 1", "hallwaydoorright 1", "bathroomdoorright 1", "elevatordoorright 1" ]
     },
     {
       "name": "doorleftwildcardup",
-      "tiles": [ "roomdoorright", "hallwaydoorright" ]
+      "tiles": [ "roomdoorright", "hallwaydoorright", "bathroomdoorright", "elevatordoorright" ]
     },
     {
       "name": "doorleftwildcardright",
-      "tiles": [ "roomdoorright 3", "hallwaydoorright 3" ]
+      "tiles": [ "roomdoorright 3", "hallwaydoorright 3", "bathroomdoorright 3", "elevatordoorright 3" ]
     },
     {
       "name": "doorleftwildcarddown",
-      "tiles": [ "roomdoorright 2", "hallwaydoorright 2" ]
+      "tiles": [ "roomdoorright 2", "hallwaydoorright 2", "bathroomdoorright 2", "elevatordoorright 2" ]
     },
     {
       "name": "doorrightwildcardleft",
-      "tiles": [ "roomdoorleft 1", "hallwaydoorleft 1" ]
+      "tiles": [ "roomdoorleft 1", "hallwaydoorleft 1", "bathroomdoorleft 1", "elevatordoorleft 1" ]
     },
     {
       "name": "doorrightwildcardup",
-      "tiles": [ "roomdoorleft", "hallwaydoorleft" ]
+      "tiles": [ "roomdoorleft", "hallwaydoorleft", "bathroomdoorleft", "elevatordoorleft" ]
     },
     {
       "name": "doorrightwildcardright",
-      "tiles": [ "roomdoorleft 3", "hallwaydoorleft 3" ]
+      "tiles": [ "roomdoorleft 3", "hallwaydoorleft 3", "bathroomdoorleft 3", "elevatordoorleft 3" ]
     },
     {
       "name": "doorrightwildcarddown",
-      "tiles": [ "roomdoorleft 2", "hallwaydoorleft 2" ]
+      "tiles": [ "roomdoorleft 2", "hallwaydoorleft 2", "bathroomdoorleft 2", "elevatordoorleft 2" ]
     }
 
   ]

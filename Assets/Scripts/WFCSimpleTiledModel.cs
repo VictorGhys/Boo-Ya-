@@ -30,7 +30,6 @@ public class WFCSimpleTiledModel : MonoBehaviour
     [SerializeField, Tooltip("The seed for random generation")]
     private int _seed = 0;
 
-    [SerializeField, Tooltip("The limit of iterations to run the algorithm, should be width*height")]
     private int _limit = 100;
 
     private List<string> _tiles = new List<string>();
@@ -126,6 +125,8 @@ public class WFCSimpleTiledModel : MonoBehaviour
 
         _stack = new Tuple<int, int>[_wave.Length * _tiles.Count];
         _stacksize = 0;
+        _limit = 40000;
+        //_limit = _width * _height;
     }
 
     void Update()
@@ -191,7 +192,7 @@ public class WFCSimpleTiledModel : MonoBehaviour
     {
        _sampleData = JsonUtility.FromJson<WFCSampleData>(_json.text);
 
-       _currentSubset = _sampleData.subsets.First(s => s.name == _subsetName);
+       _currentSubset = _sampleData.subsets.FirstOrDefault(s => s.name == _subsetName);
        if (_currentSubset == null)
        {
            Debug.Log("subset not found!");
@@ -316,7 +317,7 @@ public class WFCSimpleTiledModel : MonoBehaviour
 
         for (int i = 0; i < _wave.Length; i++)
         {
-            if (OnBoundary(i % _width, i / _height))
+            if (OnBoundary(i % _width, i / _width))
                 continue;
 
             int amount = _sumOfPossibilities[i];
@@ -434,7 +435,7 @@ public class WFCSimpleTiledModel : MonoBehaviour
             {
                 Debug.Log("problem sum of index: " + idxNoPossibilities + " is zero. Was tile " + tile);
                 float x = idxNoPossibilities % _width;
-                float z = idxNoPossibilities / _height;
+                float z = idxNoPossibilities / _width;
                 Instantiate(_tilesPrefabs[_correspondingPrefabTiles[tile]],
                     _output.transform.position + new Vector3(x, 0, z),
                     Quaternion.identity, _output.transform);
@@ -446,7 +447,7 @@ public class WFCSimpleTiledModel : MonoBehaviour
                 if (!_wave[idx][t] && _correspondingPrefabTiles[t] != 0)
                 {
                     float x = idx % _width;
-                    float z = idx / _height;
+                    float z = idx / _width;
                     Instantiate(_tilesPrefabs[_correspondingPrefabTiles[t]],
                         _output.transform.position + new Vector3(x, (counter + 1) * 2, z),
                         Quaternion.identity, _output.transform);
@@ -522,7 +523,7 @@ public class WFCSimpleTiledModel : MonoBehaviour
                 if (_wave[i][t] && _correspondingPrefabTiles[t] != 0)
                 {
                     float x = i % _width;
-                    float z = i / _height;
+                    float z = i / _width;
                     observed[i] = Instantiate(_tilesPrefabs[_correspondingPrefabTiles[t]], _output.transform.position + new Vector3(x, 0, z),
                         Quaternion.identity, _output.transform);
                     break;
