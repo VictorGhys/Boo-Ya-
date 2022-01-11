@@ -125,8 +125,7 @@ public class WFCSimpleTiledModel : MonoBehaviour
 
         _stack = new Tuple<int, int>[_wave.Length * _tiles.Count];
         _stacksize = 0;
-        _limit = 40000;
-        //_limit = _width * _height;
+        _limit = _width * _height;
     }
 
     void Update()
