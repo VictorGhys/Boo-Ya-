@@ -1,8 +1,7 @@
 using UnityEngine;
 
-public class WFCGenerator : MonoBehaviour
+public class WFCOverlapModel : MonoBehaviour
 {
-    
     void Start()
     {
         
@@ -12,5 +11,4 @@ public class WFCGenerator : MonoBehaviour
     {
         
     }
-
 }
