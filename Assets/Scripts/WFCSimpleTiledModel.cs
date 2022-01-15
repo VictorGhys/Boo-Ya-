@@ -51,7 +51,7 @@ public class WFCSimpleTiledModel : WFCModel
         public string[] tiles;
     }
 
-    protected override void GetConstraints()
+    protected override void PatternsFromSample()
     {
         // Read in the constraints from a json file
        _sampleData = JsonUtility.FromJson<WFCSampleData>(_json.text);
@@ -67,13 +67,14 @@ public class WFCSimpleTiledModel : WFCModel
        {
            _tiles.Add(tile);
        }
-       _NbOfTiles = _tiles.Count;
+       _nbOfPatterns = _tiles.Count;
+       _nbOfTiles = _tiles.Count;
 
        // Get the weight of each tile
-       weights = new double[_NbOfTiles];
-       for (int tile = 0; tile < _NbOfTiles; tile++)
+       _weights = new double[_nbOfPatterns];
+       for (int tile = 0; tile < _nbOfPatterns; tile++)
        {
-           weights[tile] = _sampleData.constraints[tile].weight;
+           _weights[tile] = _sampleData.constraints[tile].weight;
        }
     }
 
@@ -83,11 +84,11 @@ public class WFCSimpleTiledModel : WFCModel
         _propagator = new int[4][][];
         for (int dir = 0; dir < 4; dir++)
         {
-            _propagator[dir] = new int[_NbOfTiles][];
+            _propagator[dir] = new int[_nbOfPatterns][];
         }
 
         // Fill in the constraints of each tile in the subset
-        _correspondingPrefabTiles = new int[_NbOfTiles];
+        _correspondingPrefabTiles = new int[_nbOfPatterns];
         for(int t = 0; t < _currentSubset.tiles.Length; t++)
         {
             Constraint currentConstraint = _sampleData.constraints.First(c => c.tile == _currentSubset.tiles[t]);
@@ -140,45 +141,21 @@ public class WFCSimpleTiledModel : WFCModel
         return allowedIndexes;
     }
 
-    protected override void Init()
-    {
-        _wave = new bool[_width * _height][];
-        _compatible = new int[_wave.Length][][];
-        for (int i = 0; i < _wave.Length; i++)
-        {
-            _wave[i] = new bool[_NbOfTiles];
-            _compatible[i] = new int[_NbOfTiles][];
-            for (int tile = 0; tile < _NbOfTiles; tile++)
-                _compatible[i][tile] = new int[4];
-        }
-
-        // Calculate weights for entropy
-        weightLogWeights = new double[_NbOfTiles];
-        sumOfWeights = 0;
-        sumOfWeightLogWeights = 0;
-
-        for (int t = 0; t < _NbOfTiles; t++)
-        {
-            weightLogWeights[t] = weights[t] * Math.Log(weights[t]);
-            sumOfWeights += weights[t];
-            sumOfWeightLogWeights += weightLogWeights[t];
-        }
-
-        startingEntropy = Math.Log(sumOfWeights) - sumOfWeightLogWeights / sumOfWeights;
-
-        _sumOfPossibilities = new int[_width * _height];
-        sumsOfWeights = new double[_width * _height];
-        sumsOfWeightLogWeights = new double[_width * _height];
-        entropies = new double[_width * _height];
-
-        _stack = new Tuple<int, int>[_wave.Length * _NbOfTiles];
-        _stacksize = 0;
-        _limit = _width * _height;
-    }
-
     protected override bool OnBoundary(int x, int y)
     {
         return x < 0 || y < 0 || x >= _width || y >= _height;
     }
 
+    protected override int Sample(int x, int y)
+    {
+        // Return the tile for position x y
+        for (int t = 0; t < _nbOfTiles; t++)
+        {
+            if (_wave[x + y * _width][t] && _correspondingPrefabTiles[t] != 0)
+            {
+                return t;
+            }
+        }
+        return -1;
+    }
 }

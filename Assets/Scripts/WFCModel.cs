@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEditor.PackageManager.UI;
 using UnityEngine;
 
 public abstract class WFCModel: MonoBehaviour
@@ -38,18 +39,19 @@ public abstract class WFCModel: MonoBehaviour
     protected int[] _sumOfPossibilities;
 
     // Weights
-    protected double[] weights;
-    protected double[] weightLogWeights;
-    protected double sumOfWeights, sumOfWeightLogWeights, startingEntropy;
+    protected double[] _weights;
+    protected double[] _weightLogWeights;
+    protected double _sumOfWeights, _sumOfWeightLogWeights, _startingEntropy;
 
-    protected double[] sumsOfWeights, sumsOfWeightLogWeights, entropies;
+    protected double[] _sumsOfWeights, _sumsOfWeightLogWeights, _entropies;
 
     // Stack in order: index, tile
     protected Tuple<int, int>[] _stack;
     protected int _stacksize;
 
-    protected int _NbOfTiles;
-    protected bool Stop = false;
+    protected int _nbOfPatterns;
+    protected int _nbOfTiles;
+    protected bool _stop = false;
     protected int[] _correspondingPrefabTiles;
 
     // Direction and offsets for quick convertion to neighbours
@@ -57,30 +59,65 @@ public abstract class WFCModel: MonoBehaviour
     {
         Left = 0, Up = 1, Right = 2, Down = 3
     }
-    static int[] XDirectionOffsets = { -1, 0, 1, 0 };
-    static int[] YDirectionOffsets = { 0, 1, 0, -1 };
+    protected static int[] XDirectionOffsets = { -1, 0, 1, 0 };
+    protected static int[] YDirectionOffsets = { 0, 1, 0, -1 };
     static readonly int[] OppositeDirection = { 2, 3, 0, 1 };
 
-    protected abstract void Init();
-    protected abstract void GetConstraints();
+    protected abstract void PatternsFromSample();
     protected abstract void BuildPropagator();
     protected abstract bool OnBoundary(int x, int y);
+    protected abstract int Sample(int x, int y);
 
     void Start()
     {
-        GetConstraints();
+        PatternsFromSample();
         BuildPropagator();
         Init();
         Clear();
         if (Run(_seed, _limit))
         {
             OutputObservations();
-            Debug.Log("WFC finished successfully");
+            Debug.Log("WFC finished successfully!");
         }
         else
-            Debug.Log("WFC failed");
+            Debug.Log("WFC failed! :(");
     }
 
+    private void Init()
+    {
+        _wave = new bool[_width * _height][];
+        _compatible = new int[_wave.Length][][];
+        for (int i = 0; i < _wave.Length; i++)
+        {
+            _wave[i] = new bool[_nbOfPatterns];
+            _compatible[i] = new int[_nbOfPatterns][];
+            for (int tile = 0; tile < _nbOfPatterns; tile++)
+                _compatible[i][tile] = new int[4];
+        }
+
+        // Calculate weights for entropy
+        _weightLogWeights = new double[_nbOfPatterns];
+        _sumOfWeights = 0;
+        _sumOfWeightLogWeights = 0;
+
+        for (int t = 0; t < _nbOfPatterns; t++)
+        {
+            _weightLogWeights[t] = _weights[t] * Math.Log(_weights[t]);
+            _sumOfWeights += _weights[t];
+            _sumOfWeightLogWeights += _weightLogWeights[t];
+        }
+
+        _startingEntropy = Math.Log(_sumOfWeights) - _sumOfWeightLogWeights / _sumOfWeights;
+
+        _sumOfPossibilities = new int[_width * _height];
+        _sumsOfWeights = new double[_width * _height];
+        _sumsOfWeightLogWeights = new double[_width * _height];
+        _entropies = new double[_width * _height];
+
+        _stack = new Tuple<int, int>[_wave.Length * _nbOfPatterns];
+        _stacksize = 0;
+        _limit = _width * _height;
+    }
 
     bool Run(int seed, int limit)
     {
@@ -119,12 +156,12 @@ public abstract class WFCModel: MonoBehaviour
 
         bool[] w = _wave[(int)node];
         // Create a weighted distribution
-        double[] distribution = new double[_NbOfTiles];
-        for (int tile = 0; tile < _NbOfTiles; tile++)
+        double[] distribution = new double[_nbOfPatterns];
+        for (int tile = 0; tile < _nbOfPatterns; tile++)
         {
             if (w[tile])
             {
-                distribution[tile] = weights[tile];
+                distribution[tile] = _weights[tile];
             }
             else
             {
@@ -134,7 +171,7 @@ public abstract class WFCModel: MonoBehaviour
 
         int chosenPattern = GetWeightedRandom(distribution, _random.NextDouble());
         // Remove all the other possibilities except the chosen pattern
-        for (int tile = 0; tile < _NbOfTiles; tile++)
+        for (int tile = 0; tile < _nbOfPatterns; tile++)
             if (w[tile] != (tile == chosenPattern))
                 Ban((int)node, tile);
         //Debug.Log("position: " + node + " is tile " + chosenPattern + " " + _tiles[chosenPattern]);
@@ -155,7 +192,7 @@ public abstract class WFCModel: MonoBehaviour
             if (amount == 0)
                 return null;
 
-            double entropy = entropies[i];
+            double entropy = _entropies[i];
             if (amount > 1 && entropy <= min)
             {
                 double noise = 1E-6 * _random.NextDouble();
@@ -218,7 +255,7 @@ public abstract class WFCModel: MonoBehaviour
                     // Ban the tile if it no longer is compatible with the surrounding tiles
                     if (comp[d] == 0)
                         Ban(idxPropagation, t2);
-                    if (Stop)
+                    if (_stop)
                         return;
                 }
             }
@@ -237,36 +274,39 @@ public abstract class WFCModel: MonoBehaviour
         _stack[_stacksize] = new Tuple<int, int>(i, t);
         _stacksize++;
 
-        double sum = sumsOfWeights[i];
-        entropies[i] += sumsOfWeightLogWeights[i] / sum - Math.Log(sum);
+        double sum = _sumsOfWeights[i];
+        _entropies[i] += _sumsOfWeightLogWeights[i] / sum - Math.Log(sum);
 
         _sumOfPossibilities[i] -= 1;
-        if (_sumOfPossibilities[i] == 0 && !Stop)
+
+        // Stop and show debug info in algorithm fails
+        if (_sumOfPossibilities[i] == 0 && !_stop)
         {
-            Stop = true;
+            _stop = true;
             DumpWave(i, t);
         }
-        sumsOfWeights[i] -= weights[t];
-        sumsOfWeightLogWeights[i] -= weightLogWeights[t];
 
-        sum = sumsOfWeights[i];
-        entropies[i] -= sumsOfWeightLogWeights[i] / sum - Math.Log(sum);
+        _sumsOfWeights[i] -= _weights[t];
+        _sumsOfWeightLogWeights[i] -= _weightLogWeights[t];
+
+        sum = _sumsOfWeights[i];
+        _entropies[i] -= _sumsOfWeightLogWeights[i] / sum - Math.Log(sum);
     }
 
     void Clear()
     {
         for (int i = 0; i < _wave.Length; i++)
         {
-            for (int tile = 0; tile < _NbOfTiles; tile++)
+            for (int tile = 0; tile < _nbOfPatterns; tile++)
             {
                 _wave[i][tile] = true;
                 for (int dir = 0; dir < 4; dir++)
                     _compatible[i][tile][dir] = _propagator[OppositeDirection[dir]][tile].Length;
             }
-            _sumOfPossibilities[i] = _NbOfTiles;
-            sumsOfWeights[i] = sumOfWeights;
-            sumsOfWeightLogWeights[i] = sumOfWeightLogWeights;
-            entropies[i] = startingEntropy;
+            _sumOfPossibilities[i] = _nbOfPatterns;
+            _sumsOfWeights[i] = _sumOfWeights;
+            _sumsOfWeightLogWeights[i] = _sumOfWeightLogWeights;
+            _entropies[i] = _startingEntropy;
         }
 
     }
@@ -315,20 +355,28 @@ public abstract class WFCModel: MonoBehaviour
         // Add new tile prefabs to output
         GameObject[] observed = new GameObject[_width * _height];
         for (int i = 0; i < _wave.Length; i++)
-        for (int t = 0; t < _NbOfTiles; t++)
-            if (_wave[i][t] && _correspondingPrefabTiles[t] != 0)
+        {
+            float x = i % _width;
+            float z = i / _width;
+            int tilePrefabIdx = Sample((int)x, (int)z);
+            if (tilePrefabIdx != -1)
             {
-                float x = i % _width;
-                float z = i / _width;
-                observed[i] = Instantiate(_tilesPrefabs[_correspondingPrefabTiles[t]], _output.transform.position + new Vector3(x, 0, z),
+                observed[i] = Instantiate(_tilesPrefabs[tilePrefabIdx],
+                    _output.transform.position + new Vector3(x, 0, z),
                     Quaternion.identity, _output.transform);
-                break;
             }
+        }
     }
 
 
     private void DumpWave(int idxNoPossibilities, int tile)
     {
+        // Overlapping WFC can't have debug visualization
+        if (_nbOfPatterns != _nbOfTiles)
+        {
+            return;
+        }
+
         for (int idx = 0; idx < _wave.Length; idx++)
         {
             if (idx == idxNoPossibilities)
@@ -342,7 +390,7 @@ public abstract class WFCModel: MonoBehaviour
                 continue;
             }
             int counter = 0;
-            for (int t = 0; t < _NbOfTiles; t++)
+            for (int t = 0; t < _nbOfTiles; t++)
             {
                 if (!_wave[idx][t] && _correspondingPrefabTiles[t] != 0)
                 {
