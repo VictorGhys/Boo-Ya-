@@ -43,6 +43,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: RoomDoorFrameWall_PF
       objectReference: {fileID: 0}
+    - target: {fileID: 6666875610869416163, guid: cb98fab001eda8a42a0275aa33f00bc0, type: 3}
+      propertyPath: m_Mesh
+      value: 
+      objectReference: {fileID: -3612625033413482484, guid: 5bcf86889325c994c8e4090b9b6802ce, type: 3}
     - target: {fileID: 8973731264468777176, guid: cb98fab001eda8a42a0275aa33f00bc0, type: 3}
       propertyPath: m_RootOrder
       value: 0
@@ -87,6 +91,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 9180684355395390539, guid: cb98fab001eda8a42a0275aa33f00bc0, type: 3}
+      propertyPath: m_Mesh
+      value: 
+      objectReference: {fileID: -3612625033413482484, guid: 5bcf86889325c994c8e4090b9b6802ce, type: 3}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: cb98fab001eda8a42a0275aa33f00bc0, type: 3}
 --- !u!4 &9197593762481470577 stripped

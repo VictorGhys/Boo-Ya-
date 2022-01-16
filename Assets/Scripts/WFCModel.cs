@@ -22,6 +22,12 @@ public abstract class WFCModel: MonoBehaviour
     [SerializeField, Tooltip("The seed for random generation")]
     protected int _seed = 0;
 
+    [SerializeField, Tooltip("The amount of times to retry if wfc fails")]
+    private int _retries = 3;
+
+    [SerializeField, Tooltip("Whether or not to have an empty border in the output to prevent open rooms at the border")]
+    private bool _emptyBorder = true;
+
     protected int _limit = 100;
     // Holds the possibilities of tiles of every position on the grid. Indexes in order: Index, Tile
     protected bool[][] _wave;
@@ -74,13 +80,21 @@ public abstract class WFCModel: MonoBehaviour
         BuildPropagator();
         Init();
         Clear();
-        if (Run(_seed, _limit))
+        while (_retries > 0)
         {
-            OutputObservations();
-            Debug.Log("WFC finished successfully!");
+            _retries--;
+            if (Run(_seed, _limit))
+            {
+                OutputObservations();
+                Debug.Log("WFC finished successfully!");
+                break;
+            }
+            else
+            {
+                Debug.Log("WFC failed! :(");
+                Clear();
+            }
         }
-        else
-            Debug.Log("WFC failed! :(");
     }
 
     private void Init()
@@ -295,6 +309,7 @@ public abstract class WFCModel: MonoBehaviour
 
     void Clear()
     {
+        _stop = false;
         for (int i = 0; i < _wave.Length; i++)
         {
             for (int tile = 0; tile < _nbOfPatterns; tile++)
@@ -309,6 +324,27 @@ public abstract class WFCModel: MonoBehaviour
             _entropies[i] = _startingEntropy;
         }
 
+        // Create empty border in the output to prevent open rooms at the border
+        if (_emptyBorder)
+        {
+            for (int x = 0; x < _width; x++)
+            {
+                for (int y = 0; y < _height; y++)
+                {
+                    if (x == 0 || y == 0 || x == _width - 1 || y == _height - 1)
+                    {
+                        int chosenPattern = 0;
+                        int node = x + y * _width;
+                        bool[] w = _wave[node];
+                        // Remove all the other possibilities except the chosen pattern
+                        for (int tile = 0; tile < _nbOfPatterns; tile++)
+                            if (w[tile] != (tile == chosenPattern))
+                                Ban(node, tile);
+                    }
+                }
+            }
+            Propagate();
+        }
     }
 
 

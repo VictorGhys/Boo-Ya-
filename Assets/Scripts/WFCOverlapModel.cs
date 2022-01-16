@@ -11,10 +11,10 @@ public class WFCOverlapModel : WFCModel
     [SerializeField, Tooltip("The size of one grid block")]
     private int _gridSize = 1;
     [SerializeField, Tooltip("The width of the grid to sample from")]
-    protected int _sampleAreaWidth = 5;
+    private int _sampleAreaWidth = 5;
     [SerializeField, Tooltip("The height of the grid to sample from")]
-    protected int _sampleAreaHeight = 5;
-
+    private int _sampleAreaHeight = 5;
+    
     [SerializeField, Tooltip("The kind of symmetry that is used on the patterns derived from the input")]
     private Symmetry _symmetry = Symmetry.AllSymmetry;
     [SerializeField, Tooltip("The input to train this model")]
