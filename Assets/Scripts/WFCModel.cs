@@ -1,9 +1,13 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEditor.PackageManager.UI;
 using UnityEngine;
+using Random = System.Random;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
+[ExecuteInEditMode]
 public abstract class WFCModel: MonoBehaviour
 {
     [SerializeField,
@@ -29,6 +33,10 @@ public abstract class WFCModel: MonoBehaviour
     private bool _emptyBorder = true;
 
     protected int _limit = 100;
+    
+    // Hold the names of the tiles
+    protected List<string> _tiles = new List<string>();
+
     // Holds the possibilities of tiles of every position on the grid. Indexes in order: Index, Tile
     protected bool[][] _wave;
 
@@ -44,7 +52,7 @@ public abstract class WFCModel: MonoBehaviour
     // The number of tiles that are possible at a given index
     protected int[] _sumOfPossibilities;
 
-    // Weights
+    // Weights and Entropy
     protected double[] _weights;
     protected double[] _weightLogWeights;
     protected double _sumOfWeights, _sumOfWeightLogWeights, _startingEntropy;
@@ -76,13 +84,19 @@ public abstract class WFCModel: MonoBehaviour
 
     void Start()
     {
+        Generate();
+    }
+
+    public void Generate()
+    {
         PatternsFromSample();
         BuildPropagator();
         Init();
-        Clear();
-        while (_retries > 0)
+        int r = _retries;
+        while (r > 0)
         {
-            _retries--;
+            r--;
+            Clear();
             if (Run(_seed, _limit))
             {
                 OutputObservations();
@@ -92,7 +106,6 @@ public abstract class WFCModel: MonoBehaviour
             else
             {
                 Debug.Log("WFC failed! :(");
-                Clear();
             }
         }
     }
@@ -136,13 +149,9 @@ public abstract class WFCModel: MonoBehaviour
     bool Run(int seed, int limit)
     {
         if (seed == 0)
-        {
             _random = new System.Random();
-        }
         else
-        {
             _random = new System.Random(seed);
-        }
 
         for (int l = 0; l < limit || limit == 0; l++)
         {
@@ -151,7 +160,6 @@ public abstract class WFCModel: MonoBehaviour
                 return (bool)result;
             else
                 Propagate();
-
         }
 
         return true;
@@ -188,7 +196,18 @@ public abstract class WFCModel: MonoBehaviour
         for (int tile = 0; tile < _nbOfPatterns; tile++)
             if (w[tile] != (tile == chosenPattern))
                 Ban((int)node, tile);
-        //Debug.Log("position: " + node + " is tile " + chosenPattern + " " + _tiles[chosenPattern]);
+        Debug.Log("position: " + node + " is tile " + chosenPattern + " " + _tiles[chosenPattern]);
+        
+        // Show the tiles that is placed below
+        //float x = (int)node % _width;
+        //float z = (int)node / _width;
+        //if (_sumOfPossibilities[(int)node] == 1)
+        //{
+        //    Instantiate(_tilesPrefabs[_correspondingPrefabTiles[chosenPattern]],
+        //        _output.transform.position + new Vector3(x, -2, z),
+        //        Quaternion.identity, _output.transform);
+        //}
+
         return null;
     }
 
@@ -307,16 +326,41 @@ public abstract class WFCModel: MonoBehaviour
         _entropies[i] -= _sumsOfWeightLogWeights[i] / sum - Math.Log(sum);
     }
 
-    void Clear()
+    public void Clear()
     {
         _stop = false;
+
+        // Create output if it doesn't exist
+        if (!_output)
+            _output = new GameObject("OutputWFC");
+
+        // Destroy previous output
+        GameObject[] allChildrenToDestroy = new GameObject[_output.transform.childCount];
+        for (int i = 0; i < _output.transform.childCount; i++)
+        {
+            allChildrenToDestroy[i] = _output.transform.GetChild(i).gameObject;
+        }
+        
+        foreach (GameObject child in allChildrenToDestroy)
+        {
+            if (Application.isPlaying)
+                Destroy(child);
+            else
+                DestroyImmediate(child);
+        }
+
+        // Reset wave, compatible, weights and entropies
         for (int i = 0; i < _wave.Length; i++)
         {
             for (int tile = 0; tile < _nbOfPatterns; tile++)
             {
                 _wave[i][tile] = true;
                 for (int dir = 0; dir < 4; dir++)
-                    _compatible[i][tile][dir] = _propagator[OppositeDirection[dir]][tile].Length;
+                {
+                    int oppositeDirection = OppositeDirection[dir];
+                    int temp = _propagator[oppositeDirection][tile].Length;
+                    _compatible[i][tile][dir] = temp;
+                }
             }
             _sumOfPossibilities[i] = _nbOfPatterns;
             _sumsOfWeights[i] = _sumOfWeights;
@@ -377,17 +421,6 @@ public abstract class WFCModel: MonoBehaviour
 
     void OutputObservations()
     {
-        // Create output if it doesn't exist
-        if (!_output)
-            _output = new GameObject("OutputWFC");
-
-        // Destroy previous output
-        for (int i = 0; i < _output.transform.childCount; i++)
-        {
-            GameObject go = _output.transform.GetChild(i).gameObject;
-            Destroy(go);
-        }
-
         // Add new tile prefabs to output
         GameObject[] observed = new GameObject[_width * _height];
         for (int i = 0; i < _wave.Length; i++)
@@ -415,11 +448,12 @@ public abstract class WFCModel: MonoBehaviour
 
         for (int idx = 0; idx < _wave.Length; idx++)
         {
+            float x = idx % _width;
+            float z = idx / _width;
+            // Show the tile that caused the 0 possibilities
             if (idx == idxNoPossibilities)
             {
-                Debug.Log("problem sum of index: " + idxNoPossibilities + " is zero. Was tile " + tile);
-                float x = idxNoPossibilities % _width;
-                float z = idxNoPossibilities / _width;
+                Debug.Log("problem sum of index: " + idxNoPossibilities + " is zero. Was tile " + tile + " " + _tiles[tile]);
                 Instantiate(_tilesPrefabs[_correspondingPrefabTiles[tile]],
                     _output.transform.position + new Vector3(x, 0, z),
                     Quaternion.identity, _output.transform);
@@ -428,18 +462,40 @@ public abstract class WFCModel: MonoBehaviour
             int counter = 0;
             for (int t = 0; t < _nbOfTiles; t++)
             {
+                // Show banned possibilities above the output
                 if (!_wave[idx][t] && _correspondingPrefabTiles[t] != 0)
                 {
-                    float x = idx % _width;
-                    float z = idx / _width;
+                    
                     Instantiate(_tilesPrefabs[_correspondingPrefabTiles[t]],
                         _output.transform.position + new Vector3(x, (counter + 1) * 2, z),
                         Quaternion.identity, _output.transform);
                     counter++;
-                    //break;
                 }
             }
         }
     }
-
 }
+
+
+#if UNITY_EDITOR
+[CustomEditor(typeof(WFCModel), true)]
+public class WFCEditor : Editor
+{
+    private WFCModel me;
+
+    public void Awake()
+    {
+        me = (WFCModel)target;
+    }
+
+    public override void OnInspectorGUI()
+    {
+        if (GUILayout.Button("GENERATE"))
+        {
+            me.Generate();
+        }
+        
+        DrawDefaultInspector();
+    }
+}
+#endif

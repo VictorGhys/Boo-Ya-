@@ -1,9 +1,6 @@
 using System.Collections.Generic;
-using System.Xml;
-using System.Xml.Linq;
 using System;
 using System.Linq;
-using UnityEditor.PackageManager.UI;
 using UnityEngine;
 
 public class WFCSimpleTiledModel : WFCModel
@@ -14,9 +11,7 @@ public class WFCSimpleTiledModel : WFCModel
 
     [SerializeField, Tooltip("The name of the subset to use of the xml file")]
     private string _subsetName;
-
-    private List<string> _tiles = new List<string>();
-
+    
     private WFCSampleData _sampleData;
 
     protected WFCSimpleTiledModel.Subset _currentSubset;
@@ -24,46 +19,47 @@ public class WFCSimpleTiledModel : WFCModel
     [Serializable]
     public class WFCSampleData
     {
-        public Constraint[] constraints;
-        public Subset[] subsets;
-        public Alias[] aliases;
+        public Constraint[] Constraints;
+        public Subset[] Subsets;
+        public Alias[] Aliases;
     }
     [Serializable]
     public class Constraint
     {
-        public string tile;
-        public double weight = 1;
-        public string[] left;
-        public string[] up;
-        public string[] right;
-        public string[] down;
+        public string Tile;
+        public double Weight = 1;
+        public string[] Left;
+        public string[] Up;
+        public string[] Right;
+        public string[] Down;
     }
     [Serializable]
     public class Subset
     {
-        public string name;
-        public string[] tiles;
+        public string Name;
+        public string[] Tiles;
     }
     [Serializable]
     public class Alias
     {
-        public string name;
-        public string[] tiles;
+        public string Name;
+        public string[] Tiles;
     }
 
     protected override void PatternsFromSample()
     {
         // Read in the constraints from a json file
-       _sampleData = JsonUtility.FromJson<WFCSampleData>(_json.text);
+        _sampleData = JsonUtility.FromJson<WFCSampleData>(_json.text);
 
-       _currentSubset = _sampleData.subsets.FirstOrDefault(s => s.name == _subsetName);
+       _currentSubset = _sampleData.Subsets.FirstOrDefault(s => s.Name == _subsetName);
        if (_currentSubset == null)
        {
            Debug.Log("subset not found!");
            return;
        }
 
-       foreach (var tile in _currentSubset.tiles)
+       _tiles.Clear();
+       foreach (var tile in _currentSubset.Tiles)
        {
            _tiles.Add(tile);
        }
@@ -74,7 +70,7 @@ public class WFCSimpleTiledModel : WFCModel
        _weights = new double[_nbOfPatterns];
        for (int tile = 0; tile < _nbOfPatterns; tile++)
        {
-           _weights[tile] = _sampleData.constraints[tile].weight;
+           _weights[tile] = _sampleData.Constraints[tile].Weight;
        }
     }
 
@@ -89,26 +85,26 @@ public class WFCSimpleTiledModel : WFCModel
 
         // Fill in the constraints of each tile in the subset
         _correspondingPrefabTiles = new int[_nbOfPatterns];
-        for(int t = 0; t < _currentSubset.tiles.Length; t++)
+        for(int t = 0; t < _currentSubset.Tiles.Length; t++)
         {
-            Constraint currentConstraint = _sampleData.constraints.First(c => c.tile == _currentSubset.tiles[t]);
-            _correspondingPrefabTiles[t] = Array.FindIndex(_sampleData.constraints, c => c == currentConstraint); 
+            Constraint currentConstraint = _sampleData.Constraints.First(c => c.Tile == _currentSubset.Tiles[t]);
+            _correspondingPrefabTiles[t] = Array.FindIndex(_sampleData.Constraints, c => c == currentConstraint); 
             foreach (Direction direction in (Direction[])Enum.GetValues(typeof(Direction)))
             {
                 List<int> allowedIndexes;
                 switch (direction)
                 {
                     case Direction.Left:
-                        allowedIndexes = GetAllowedConstraints(currentConstraint.left);
+                        allowedIndexes = GetAllowedConstraints(currentConstraint.Left);
                         break;
                     case Direction.Up:
-                        allowedIndexes = GetAllowedConstraints(currentConstraint.up);
+                        allowedIndexes = GetAllowedConstraints(currentConstraint.Up);
                         break;
                     case Direction.Right:
-                        allowedIndexes = GetAllowedConstraints(currentConstraint.right);
+                        allowedIndexes = GetAllowedConstraints(currentConstraint.Right);
                         break;
                     case Direction.Down:
-                        allowedIndexes = GetAllowedConstraints(currentConstraint.down);
+                        allowedIndexes = GetAllowedConstraints(currentConstraint.Down);
                         break;
                     default:
                         throw new ArgumentOutOfRangeException();
@@ -127,13 +123,13 @@ public class WFCSimpleTiledModel : WFCModel
             int allowedIdx = _tiles.FindIndex(tile => tile == s);
             if (allowedIdx < 0)
             {
-                Alias foundAlias = _sampleData.aliases.FirstOrDefault(alias => alias.name == s);
+                Alias foundAlias = _sampleData.Aliases.FirstOrDefault(alias => alias.Name == s);
                 if (foundAlias == null)
                 {
                     Debug.Log("Can't find tile " + s + " in tiles");
                     continue;
                 }
-                allowedIndexes.AddRange(GetAllowedConstraints(foundAlias.tiles)); 
+                allowedIndexes.AddRange(GetAllowedConstraints(foundAlias.Tiles)); 
                 continue;
             }
             allowedIndexes.Add(allowedIdx);
@@ -151,9 +147,15 @@ public class WFCSimpleTiledModel : WFCModel
         // Return the tile for position x y
         for (int t = 0; t < _nbOfTiles; t++)
         {
-            if (_wave[x + y * _width][t] && _correspondingPrefabTiles[t] != 0)
+            if (_wave[x + y * _width][t])
             {
-                return t;
+                string wantedTile = _tiles[t];
+                int prefabIdx = _tilesPrefabs.FindIndex(pf => pf.name == wantedTile);
+                if (prefabIdx < 0)
+                {
+                    Debug.Log("can't find tile: " + wantedTile);
+                }
+                return prefabIdx;
             }
         }
         return -1;

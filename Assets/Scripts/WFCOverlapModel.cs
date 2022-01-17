@@ -25,8 +25,6 @@ public class WFCOverlapModel : WFCModel
         NoSymmetry = 1, Reflect = 2, AllSymmetry = 8
     }
 
-    // Hold the names of the tiles
-    private List<string> _tiles = new List<string>();
     // Holds the indexes of tiles for every position on the grid x,z
     private byte[,] _sample;
     // The patterns of tiles
@@ -50,7 +48,7 @@ public class WFCOverlapModel : WFCModel
         {
             Debug.Log("Add empty tile because input is not completely filled");
             _tiles.Add(null);
-            _tileDictionary.Add("empty", 0);
+            _tileDictionary.Add("Empty", 0);
             correspondingPrefabTilesList.Add(0);
         }
 
