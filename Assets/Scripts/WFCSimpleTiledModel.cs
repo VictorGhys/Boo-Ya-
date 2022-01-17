@@ -158,6 +158,21 @@ public class WFCSimpleTiledModel : WFCModel
                 return prefabIdx;
             }
         }
+        Debug.Log("no prefab index found!");
         return -1;
+    }
+
+    protected override void CreateEmptyBorderPiece(int x, int y)
+    {
+        if (x == 0 || y == 0 || x == _width - 1 || y == _height - 1)
+        {
+            int chosenPattern = 0;
+            int node = x + y * _width;
+            bool[] w = _wave[node];
+            // Remove all the other possibilities except the chosen pattern
+            for (int tile = 0; tile < _nbOfPatterns; tile++)
+                if (w[tile] != (tile == chosenPattern))
+                    Ban(node, tile);
+        }
     }
 }

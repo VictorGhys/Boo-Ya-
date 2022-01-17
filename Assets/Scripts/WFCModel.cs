@@ -81,10 +81,16 @@ public abstract class WFCModel: MonoBehaviour
     protected abstract void BuildPropagator();
     protected abstract bool OnBoundary(int x, int y);
     protected abstract int Sample(int x, int y);
+    protected abstract void CreateEmptyBorderPiece(int x, int y);
 
     void Start()
     {
         Generate();
+    }
+
+    void Update()
+    {
+
     }
 
     public void Generate()
@@ -105,7 +111,7 @@ public abstract class WFCModel: MonoBehaviour
             }
             else
             {
-                Debug.Log("WFC failed! :(");
+                Debug.LogWarning("WFC failed! :(");
             }
         }
     }
@@ -161,7 +167,7 @@ public abstract class WFCModel: MonoBehaviour
             else
                 Propagate();
         }
-
+        Debug.Log("limit reached!");
         return true;
     }
 
@@ -196,7 +202,7 @@ public abstract class WFCModel: MonoBehaviour
         for (int tile = 0; tile < _nbOfPatterns; tile++)
             if (w[tile] != (tile == chosenPattern))
                 Ban((int)node, tile);
-        Debug.Log("position: " + node + " is tile " + chosenPattern + " " + _tiles[chosenPattern]);
+        //Debug.Log("position: " + node + " is tile " + chosenPattern + " " + _tiles[chosenPattern]);
         
         // Show the tiles that is placed below
         //float x = (int)node % _width;
@@ -326,7 +332,7 @@ public abstract class WFCModel: MonoBehaviour
         _entropies[i] -= _sumsOfWeightLogWeights[i] / sum - Math.Log(sum);
     }
 
-    public void Clear()
+    void Clear()
     {
         _stop = false;
 
@@ -357,9 +363,7 @@ public abstract class WFCModel: MonoBehaviour
                 _wave[i][tile] = true;
                 for (int dir = 0; dir < 4; dir++)
                 {
-                    int oppositeDirection = OppositeDirection[dir];
-                    int temp = _propagator[oppositeDirection][tile].Length;
-                    _compatible[i][tile][dir] = temp;
+                    _compatible[i][tile][dir] = _propagator[OppositeDirection[dir]][tile].Length;
                 }
             }
             _sumOfPossibilities[i] = _nbOfPatterns;
@@ -375,24 +379,14 @@ public abstract class WFCModel: MonoBehaviour
             {
                 for (int y = 0; y < _height; y++)
                 {
-                    if (x == 0 || y == 0 || x == _width - 1 || y == _height - 1)
-                    {
-                        int chosenPattern = 0;
-                        int node = x + y * _width;
-                        bool[] w = _wave[node];
-                        // Remove all the other possibilities except the chosen pattern
-                        for (int tile = 0; tile < _nbOfPatterns; tile++)
-                            if (w[tile] != (tile == chosenPattern))
-                                Ban(node, tile);
-                    }
+                    CreateEmptyBorderPiece(x, y);
                 }
             }
             Propagate();
         }
     }
 
-
-    public static int GetWeightedRandom(double[] a, double r)
+    static int GetWeightedRandom(double[] a, double r)
     {
         double sum = a.Sum();
 
@@ -428,7 +422,7 @@ public abstract class WFCModel: MonoBehaviour
             float x = i % _width;
             float z = i / _width;
             int tilePrefabIdx = Sample((int)x, (int)z);
-            if (tilePrefabIdx != -1)
+            if (tilePrefabIdx >= 0)
             {
                 observed[i] = Instantiate(_tilesPrefabs[tilePrefabIdx],
                     _output.transform.position + new Vector3(x, 0, z),
@@ -438,7 +432,7 @@ public abstract class WFCModel: MonoBehaviour
     }
 
 
-    private void DumpWave(int idxNoPossibilities, int tile)
+    void DumpWave(int idxNoPossibilities, int tile)
     {
         // Overlapping WFC can't have debug visualization
         if (_nbOfPatterns != _nbOfTiles)
@@ -473,6 +467,13 @@ public abstract class WFCModel: MonoBehaviour
                 }
             }
         }
+    }
+
+    public void OnDrawGizmos()
+    {
+        Gizmos.matrix = _output.transform.localToWorldMatrix;
+        Gizmos.color = Color.magenta;
+        Gizmos.DrawWireCube( new Vector3(_width/2f, 0f, _height/2f), new Vector3(_width, 1, _height));
     }
 }
 

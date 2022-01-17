@@ -44,10 +44,11 @@ public class WFCOverlapModel : WFCModel
         }
 
         // Add an empty tile if not every space is used
+        _tiles.Clear();
         if (_input.transform.childCount < _sampleAreaWidth * _sampleAreaHeight)
         {
             Debug.Log("Add empty tile because input is not completely filled");
-            _tiles.Add(null);
+            _tiles.Add("Empty");
             _tileDictionary.Add("Empty", 0);
             correspondingPrefabTilesList.Add(0);
         }
@@ -240,9 +241,35 @@ public class WFCOverlapModel : WFCModel
                 int patternIdx = _patterns[t][0];
                 string wantedTile = _tiles[patternIdx];
                 int prefabIdx = _tilesPrefabs.FindIndex(pf => pf.name == wantedTile);
+                if (prefabIdx < 0)
+                {
+                    Debug.Log("can't find tile: " + wantedTile);
+                }
                 return prefabIdx;
             }
         }
+        Debug.Log("no prefab index found!");
         return -1;
+    }
+
+    protected override void CreateEmptyBorderPiece(int x, int y)
+    {
+        const int chosenPattern = 0;
+        int node = x + y * _width;
+        bool[] w = _wave[node];
+        if (x == 0 || x > _width - _sampleSize || y == 0 || y > _height - _sampleSize)
+        {
+            for (int tile = 0; tile < _nbOfPatterns; tile++)
+                if (w[tile] != (tile == chosenPattern))
+                    Ban(node, tile);
+        }
+    }
+
+    public void OnDrawGizmos()
+    {
+        base.OnDrawGizmos();
+        Gizmos.matrix = _input.transform.localToWorldMatrix;
+        Gizmos.color = Color.cyan;
+        Gizmos.DrawWireCube(new Vector3(_sampleAreaWidth / 2f, 0f, _sampleAreaHeight / 2f), new Vector3(_sampleAreaWidth, 1, _sampleAreaHeight));
     }
 }
