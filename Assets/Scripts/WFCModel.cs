@@ -258,7 +258,6 @@ public abstract class WFCModel: MonoBehaviour
             int idx = e1.Item1;
             int x = idx % _width;
             int y = idx / _width;
-            bool[] w1 = _wave[idx];
 
             // Go over all the neighbors
             for (int d = 0; d < 4; d++)

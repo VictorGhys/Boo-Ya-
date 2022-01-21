@@ -10,7 +10,7 @@ PrefabInstance:
     - target: {fileID: 168597813895745687, guid: 2012abd6d0554a04e8fee59b7054165f, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
-      objectReference: {fileID: 2100000, guid: 41f7ed321b0a2c04d844ee71e063ca93, type: 2}
+      objectReference: {fileID: 2100000, guid: 18d86d0a85081a6499a7fed6bd6a3585, type: 2}
     - target: {fileID: 3940198897031403319, guid: 2012abd6d0554a04e8fee59b7054165f, type: 3}
       propertyPath: m_Name
       value: BathroomDoorRight

@@ -14,6 +14,8 @@ public class WFCOverlapModel : WFCModel
     private int _sampleAreaWidth = 5;
     [SerializeField, Tooltip("The height of the grid to sample from")]
     private int _sampleAreaHeight = 5;
+    [SerializeField, Tooltip("The height of the grid to sample from")]
+    private double _customWeightEmpty = 0;
     
     [SerializeField, Tooltip("The kind of symmetry that is used on the patterns derived from the input")]
     private Symmetry _symmetry = Symmetry.AllSymmetry;
@@ -134,6 +136,12 @@ public class WFCOverlapModel : WFCModel
             _patterns[counter] = PatternFromIndex(w);
             _weights[counter] = weights[w];
             counter++;
+        }
+
+        // Set the weight of the empty pattern to a custom one
+        if (_customWeightEmpty != 0)
+        {
+            _weights[0] = _customWeightEmpty;
         }
 
         // Set up propagator
