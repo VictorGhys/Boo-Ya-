@@ -27,8 +27,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 3, y: -2, z: 15}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children:
-  - {fileID: 5167370808011198704}
+  m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -134,39 +133,13 @@ MonoBehaviour:
   - {fileID: 8877937028760063584, guid: c22093b22b9b3504fa601588dd08c2d3, type: 3}
   - {fileID: 7006880210679211588, guid: a4a7383e65fe3c643813cc8b318f644a, type: 3}
   - {fileID: 503112053493823940, guid: 4d4f1f72cb47ac349b6db15b5cbfd6dc, type: 3}
-  _output: {fileID: 5167370808011198705}
+  _output: {fileID: 0}
   _width: 50
   _height: 50
   _seed: 0
+  _retries: 3
+  _emptyBorder: 1
+  _showProcess: 1
+  _showWaitTime: 0.5
   _json: {fileID: 4900000, guid: 87148bb258cadd54ab169466e9338ac1, type: 3}
   _subsetName: all
---- !u!1 &5167370808011198705
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 5167370808011198704}
-  m_Layer: 0
-  m_Name: output
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &5167370808011198704
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5167370808011198705}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
-  m_Father: {fileID: 5167370807238295134}
-  m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}

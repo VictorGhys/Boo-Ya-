@@ -2,7 +2,7 @@
   "Constraints": [
     {
       "Tile": "Empty",
-      "weight": 0.000001, 
+      "Weight": 0.000001, 
       "Left": [ "Empty", "OutsideWall 3", "OutsideOuterCorner", "OutsideOuterCorner 3" ],
       "Up": [ "Empty", "OutsideWall 2", "OutsideOuterCorner 2", "OutsideOuterCorner 3" ],
       "Right": [ "Empty", "OutsideWall 1", "OutsideOuterCorner 1", "OutsideOuterCorner 2" ],

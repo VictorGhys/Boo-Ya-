@@ -39,6 +39,7 @@ public class WFCOverlapModel : WFCModel
         Dictionary<string, byte> _tileDictionary = new Dictionary<string, byte>();
         _sample = new byte[_sampleAreaWidth, _sampleAreaHeight];
         List<int> correspondingPrefabTilesList = new List<int>();
+        
         if (_input == null)
         {
             Debug.Log("No input defined");
@@ -72,7 +73,7 @@ public class WFCOverlapModel : WFCModel
                     Debug.Log("could not find " + nameWithoutIndexInBrackets + " in prefabs");
                 }
                 tile.name = nameWithoutIndexInBrackets;
-
+                
                 int x = (int)(tilepos.x) / _gridSize;
                 int z = (int)(tilepos.z) / _gridSize;
                 if (!_tileDictionary.ContainsKey(tile.name))
@@ -237,27 +238,10 @@ public class WFCOverlapModel : WFCModel
     {
         return x + _sampleSize > _width || y + _sampleSize > _height || x < 0 || y < 0;
     }
-
-    protected override int Sample(int x, int y)
+    
+    protected override int GetTileIndex(int t)
     {
-        // Return the tile for position x y
-        for (int t = 0; t < _nbOfPatterns; t++)
-        {
-            if (_wave[x + y * _width][t])
-            {
-                // Find the wanted tile in the tile prefabs
-                int patternIdx = _patterns[t][0];
-                string wantedTile = _tiles[patternIdx];
-                int prefabIdx = _tilesPrefabs.FindIndex(pf => pf.name == wantedTile);
-                if (prefabIdx < 0)
-                {
-                    Debug.Log("can't find tile: " + wantedTile);
-                }
-                return prefabIdx;
-            }
-        }
-        Debug.Log("no prefab index found!");
-        return -1;
+        return _patterns[t][0];
     }
 
     protected override void CreateEmptyBorderPiece(int x, int y)

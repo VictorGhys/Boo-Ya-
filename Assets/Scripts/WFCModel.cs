@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -7,7 +8,6 @@ using Random = System.Random;
 using UnityEditor;
 #endif
 
-[ExecuteInEditMode]
 public abstract class WFCModel: MonoBehaviour
 {
     [SerializeField,
@@ -31,6 +31,12 @@ public abstract class WFCModel: MonoBehaviour
 
     [SerializeField, Tooltip("Whether or not to have an empty border in the output to prevent open rooms at the border")]
     private bool _emptyBorder = true;
+
+    [SerializeField, Tooltip("Whether or not to show interim results during the process")]
+    private bool _showProcess = true;
+
+    [SerializeField, Tooltip("Time to wait between steps of the process")]
+    private float _showWaitTime = 0.5f;
 
     protected int _limit = 100;
     
@@ -65,8 +71,11 @@ public abstract class WFCModel: MonoBehaviour
 
     protected int _nbOfPatterns;
     protected int _nbOfTiles;
-    protected bool _stop = false;
+    protected int _currentRetry;
+    protected bool _failed = false;
     protected int[] _correspondingPrefabTiles;
+    private GameObject[][] _interimResults;
+    protected bool _isOverlappingModel = false;
 
     // Direction and offsets for quick convertion to neighbours
     protected enum Direction : int
@@ -80,7 +89,7 @@ public abstract class WFCModel: MonoBehaviour
     protected abstract void PatternsFromSample();
     protected abstract void BuildPropagator();
     protected abstract bool OnBoundary(int x, int y);
-    protected abstract int Sample(int x, int y);
+    protected abstract int GetTileIndex(int t);
     protected abstract void CreateEmptyBorderPiece(int x, int y);
 
     void Start()
@@ -90,30 +99,45 @@ public abstract class WFCModel: MonoBehaviour
 
     void Update()
     {
-
     }
-
+    
     public void Generate()
     {
         PatternsFromSample();
         BuildPropagator();
         Init();
-        int r = _retries;
-        while (r > 0)
-        {
-            r--;
-            Clear();
-            if (Run(_seed, _limit))
-            {
-                OutputObservations();
-                Debug.Log("WFC finished successfully!");
-                break;
-            }
-            else
-            {
-                Debug.LogWarning("WFC failed! :(");
-            }
-        }
+        Clear();
+
+        StartCoroutine(Run(Succes, Failed));
+
+        //int r = _retries;
+        //while (r > 0)
+        //{
+        //    Clear();
+        //    //bool result = Run();
+            
+        //    //if (result)
+        //    //{
+        //    //    OutputObservations();
+        //    //    Debug.Log("WFC finished successfully!");
+        //    //    break;
+        //    //}
+        //    //else
+        //    //{
+        //    //    Debug.LogWarning("WFC failed! :(");
+        //    //    r--;
+        //    //}
+        //}
+    }
+
+    private void Succes()
+    {
+        OutputObservations();
+        Debug.Log("WFC finished successfully!");
+    }
+    private void Failed()
+    {
+        Debug.LogWarning("WFC failed! :(");
     }
 
     private void Init()
@@ -150,26 +174,83 @@ public abstract class WFCModel: MonoBehaviour
         _stack = new Tuple<int, int>[_wave.Length * _nbOfPatterns];
         _stacksize = 0;
         _limit = _width * _height;
+
+        if (_nbOfPatterns != _nbOfTiles)
+        {
+            _isOverlappingModel = true;
+            return;
+        }
+
+        _interimResults = new GameObject[_width * _height][];
+        for (int i = 0; i < _width * _height; i++)
+        {
+            _interimResults[i] = new GameObject[_nbOfTiles];
+        }
     }
 
-    bool Run(int seed, int limit)
+    IEnumerator Run(Action onSuccess, Action onFail)
     {
-        if (seed == 0)
+        if (_seed == 0)
             _random = new System.Random();
         else
-            _random = new System.Random(seed);
+            _random = new System.Random(_seed);
 
-        for (int l = 0; l < limit || limit == 0; l++)
+        for (int l = 0; l < _limit || _limit == 0; l++)
         {
             bool? result = Observe();
             if (result != null)
-                return (bool)result;
+            {
+                if ((bool) result)
+                {
+                    onSuccess();
+                    yield break;
+                }
+                else
+                {
+                    onFail();
+                    if (_currentRetry < _retries)
+                    {
+                        _currentRetry++;
+                        Clear();
+                        StartCoroutine(Run(Succes, Failed));
+                    }
+                    yield break;
+                }
+            }
             else
                 Propagate();
+
+            if (_showProcess && Application.isPlaying)
+            {
+                yield return new WaitForSeconds(_showWaitTime);
+            }
         }
         Debug.Log("limit reached!");
-        return true;
     }
+
+    //bool Run()
+    //{
+    //    if (_seed == 0)
+    //        _random = new System.Random();
+    //    else
+    //        _random = new System.Random(_seed);
+
+    //    for ( int l = 0; l < _limit || _limit == 0; l++)
+    //    {
+    //        bool? result = Observe();
+    //        if (result != null)
+    //            return (bool)result;
+    //        else
+    //            Propagate();
+            
+    //        if (_showProcess)
+    //        {
+                
+    //        }
+    //    }
+    //    Debug.Log("limit reached!");
+    //    return true;
+    //}
 
     bool? Observe()
     {
@@ -293,7 +374,7 @@ public abstract class WFCModel: MonoBehaviour
                     // Ban the tile if it no longer is compatible with the surrounding tiles
                     if (comp[d] == 0)
                         Ban(idxPropagation, t2);
-                    if (_stop)
+                    if (_failed)
                         return;
                 }
             }
@@ -318,9 +399,9 @@ public abstract class WFCModel: MonoBehaviour
         _sumOfPossibilities[i] -= 1;
 
         // Stop and show debug info in algorithm fails
-        if (_sumOfPossibilities[i] == 0 && !_stop)
+        if (_sumOfPossibilities[i] == 0 && !_failed)
         {
-            _stop = true;
+            _failed = true;
             DumpWave(i, t);
         }
 
@@ -329,30 +410,21 @@ public abstract class WFCModel: MonoBehaviour
 
         sum = _sumsOfWeights[i];
         _entropies[i] -= _sumsOfWeightLogWeights[i] / sum - Math.Log(sum);
+
+        // Show interim process only for simple tiled model
+        if (_isOverlappingModel)
+            return;
+
+        int tileIdx = GetTileIndex(t);
+        if (_interimResults[i][tileIdx])
+            DestroyImmediate(_interimResults[i][tileIdx]);
     }
 
     void Clear()
     {
-        _stop = false;
+        _failed = false;
 
-        // Create output if it doesn't exist
-        if (!_output)
-            _output = new GameObject("OutputWFC");
-
-        // Destroy previous output
-        GameObject[] allChildrenToDestroy = new GameObject[_output.transform.childCount];
-        for (int i = 0; i < _output.transform.childCount; i++)
-        {
-            allChildrenToDestroy[i] = _output.transform.GetChild(i).gameObject;
-        }
-        
-        foreach (GameObject child in allChildrenToDestroy)
-        {
-            if (Application.isPlaying)
-                Destroy(child);
-            else
-                DestroyImmediate(child);
-        }
+        DestroyPreviousOutput();
 
         // Reset wave, compatible, weights and entropies
         for (int i = 0; i < _wave.Length; i++)
@@ -371,6 +443,23 @@ public abstract class WFCModel: MonoBehaviour
             _entropies[i] = _startingEntropy;
         }
 
+        // Create interim visualization
+        if (_showProcess && Application.isPlaying && !_isOverlappingModel)
+        {
+            for (int i = 0; i < _width * _height; i++)
+            {
+                int x = i % _width;
+                int z = i / _width;
+                for (int t = 1; t < _nbOfTiles; t++)
+                {
+                    GameObject tile = Instantiate(_tilesPrefabs[t],
+                        _output.transform.position + new Vector3(x, 0, z),
+                        Quaternion.identity, _output.transform);
+                    _interimResults[i][t] = tile;
+                }
+            }
+        }
+
         // Create empty border in the output to prevent open rooms at the border
         if (_emptyBorder)
         {
@@ -382,6 +471,28 @@ public abstract class WFCModel: MonoBehaviour
                 }
             }
             Propagate();
+        }
+    }
+
+    private void DestroyPreviousOutput()
+    {
+        // Create output if it doesn't exist
+        if (!_output)
+            _output = new GameObject("OutputWFC");
+
+        // Destroy previous output
+        GameObject[] allChildrenToDestroy = new GameObject[_output.transform.childCount];
+        for (int i = 0; i < _output.transform.childCount; i++)
+        {
+            allChildrenToDestroy[i] = _output.transform.GetChild(i).gameObject;
+        }
+
+        foreach (GameObject child in allChildrenToDestroy)
+        {
+            if (Application.isPlaying)
+                Destroy(child);
+            else
+                DestroyImmediate(child);
         }
     }
 
@@ -418,14 +529,31 @@ public abstract class WFCModel: MonoBehaviour
         GameObject[] observed = new GameObject[_width * _height];
         for (int i = 0; i < _wave.Length; i++)
         {
-            float x = i % _width;
-            float z = i / _width;
-            int tilePrefabIdx = Sample((int)x, (int)z);
-            if (tilePrefabIdx >= 0)
+            int x = i % _width;
+            int z = i / _width;
+            int prefabIdx = -1;
+            int tileIdx = -1;
+            for (int t = 0; t < _nbOfPatterns; t++)
             {
-                observed[i] = Instantiate(_tilesPrefabs[tilePrefabIdx],
+                if (_wave[x + z * _width][t])
+                {
+                    // Find the wanted tile in the tile prefabs
+                    tileIdx = GetTileIndex(t);
+                    string wantedTile = _tiles[tileIdx];
+                    prefabIdx = _tilesPrefabs.FindIndex(pf => pf.name == wantedTile);
+                    if (prefabIdx < 0)
+                    {
+                        Debug.Log("can't find tile: " + wantedTile);
+                    }
+                    break;
+                }
+            }
+            if (prefabIdx > 0)
+            {
+                GameObject tile = Instantiate(_tilesPrefabs[prefabIdx],
                     _output.transform.position + new Vector3(x, 0, z),
                     Quaternion.identity, _output.transform);
+                observed[i] = tile;
             }
         }
     }
@@ -434,7 +562,7 @@ public abstract class WFCModel: MonoBehaviour
     void DumpWave(int idxNoPossibilities, int tile)
     {
         // Overlapping WFC can't have debug visualization
-        if (_nbOfPatterns != _nbOfTiles)
+        if (_isOverlappingModel)
         {
             return;
         }

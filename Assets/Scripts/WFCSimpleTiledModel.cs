@@ -110,7 +110,6 @@ public class WFCSimpleTiledModel : WFCModel
                         throw new ArgumentOutOfRangeException();
                 }
                 _propagator[(int)direction][t] = allowedIndexes.ToArray();
-
             }
         }
     }
@@ -141,25 +140,10 @@ public class WFCSimpleTiledModel : WFCModel
     {
         return x < 0 || y < 0 || x >= _width || y >= _height;
     }
-
-    protected override int Sample(int x, int y)
+    
+    protected override int GetTileIndex(int t)
     {
-        // Return the tile for position x y
-        for (int t = 0; t < _nbOfTiles; t++)
-        {
-            if (_wave[x + y * _width][t])
-            {
-                string wantedTile = _tiles[t];
-                int prefabIdx = _tilesPrefabs.FindIndex(pf => pf.name == wantedTile);
-                if (prefabIdx < 0)
-                {
-                    Debug.Log("can't find tile: " + wantedTile);
-                }
-                return prefabIdx;
-            }
-        }
-        Debug.Log("no prefab index found!");
-        return -1;
+        return t;
     }
 
     protected override void CreateEmptyBorderPiece(int x, int y)
