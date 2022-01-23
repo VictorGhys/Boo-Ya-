@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6928386294150026489}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: OutsideInnerCorner
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -41,6 +41,14 @@ PrefabInstance:
     - target: {fileID: 4647502064957008666, guid: fed894432a4214240a28e9af1d2ac4bd, type: 3}
       propertyPath: m_Name
       value: OutsideInnerCornerWall_PF
+      objectReference: {fileID: 0}
+    - target: {fileID: 4647502064957008666, guid: fed894432a4214240a28e9af1d2ac4bd, type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 8883152734727146002, guid: fed894432a4214240a28e9af1d2ac4bd, type: 3}
+      propertyPath: m_Layer
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 8973731264468777176, guid: fed894432a4214240a28e9af1d2ac4bd, type: 3}
       propertyPath: m_RootOrder

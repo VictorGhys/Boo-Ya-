@@ -73,8 +73,9 @@ public abstract class WFCModel: MonoBehaviour
     protected int _nbOfTiles;
     protected int _currentRetry;
     protected bool _failed = false;
+    protected bool _setupDone = false;
     protected int[] _correspondingPrefabTiles;
-    private GameObject[][] _interimResults;
+    protected GameObject[][] _interimResults;
     protected bool _isOverlappingModel = false;
 
     // Direction and offsets for quick convertion to neighbours
@@ -94,7 +95,7 @@ public abstract class WFCModel: MonoBehaviour
 
     void Start()
     {
-        Generate();
+        //Generate();
     }
 
     void Update()
@@ -103,10 +104,10 @@ public abstract class WFCModel: MonoBehaviour
     
     public void Generate()
     {
-        PatternsFromSample();
-        BuildPropagator();
-        Init();
-        Clear();
+        if (!_setupDone)
+            SetUp();
+
+        _currentRetry = 0;
 
         StartCoroutine(Run(Succes, Failed));
 
@@ -128,6 +129,14 @@ public abstract class WFCModel: MonoBehaviour
         //    //    r--;
         //    //}
         //}
+    }
+
+    private void SetUp()
+    {
+        PatternsFromSample();
+        BuildPropagator();
+        Init();
+        _setupDone = true;
     }
 
     private void Succes()
@@ -190,6 +199,8 @@ public abstract class WFCModel: MonoBehaviour
 
     IEnumerator Run(Action onSuccess, Action onFail)
     {
+        Clear();
+
         if (_seed == 0)
             _random = new System.Random();
         else
@@ -211,7 +222,6 @@ public abstract class WFCModel: MonoBehaviour
                     if (_currentRetry < _retries)
                     {
                         _currentRetry++;
-                        Clear();
                         StartCoroutine(Run(Succes, Failed));
                     }
                     yield break;
@@ -283,17 +293,17 @@ public abstract class WFCModel: MonoBehaviour
         for (int tile = 0; tile < _nbOfPatterns; tile++)
             if (w[tile] != (tile == chosenPattern))
                 Ban((int)node, tile);
-        //Debug.Log("position: " + node + " is tile " + chosenPattern + " " + _tiles[chosenPattern]);
-        
-        // Show the tiles that is placed below
-        //float x = (int)node % _width;
-        //float z = (int)node / _width;
-        //if (_sumOfPossibilities[(int)node] == 1)
-        //{
-        //    Instantiate(_tilesPrefabs[_correspondingPrefabTiles[chosenPattern]],
-        //        _output.transform.position + new Vector3(x, -2, z),
-        //        Quaternion.identity, _output.transform);
-        //}
+
+        // Show the chosen tile in red
+        if (!_isOverlappingModel && Application.isPlaying)
+        {
+            MeshRenderer[] meshRenderers =
+                _interimResults[(int)node][chosenPattern].GetComponentsInChildren<MeshRenderer>();
+            foreach (MeshRenderer meshRenderer in meshRenderers)
+            {
+                meshRenderer.material.SetColor("_BaseColor", Color.magenta);
+            }
+        }
 
         return null;
     }
@@ -423,6 +433,7 @@ public abstract class WFCModel: MonoBehaviour
     void Clear()
     {
         _failed = false;
+        _stacksize = 0;
 
         DestroyPreviousOutput();
 
@@ -525,6 +536,19 @@ public abstract class WFCModel: MonoBehaviour
 
     void OutputObservations()
     {
+        // Destroy interim results
+        if (!_isOverlappingModel)
+        {
+            for (int i = 0; i < _wave.Length; i++)
+            {
+                for (int t = 0; t < _tiles.Count; t++)
+                {
+                    if (_interimResults[i][t])
+                        DestroyImmediate(_interimResults[i][t]);
+                }
+            }
+        }
+
         // Add new tile prefabs to output
         GameObject[] observed = new GameObject[_width * _height];
         for (int i = 0; i < _wave.Length; i++)

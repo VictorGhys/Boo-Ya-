@@ -5,10 +5,13 @@ EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Scenes:
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/MainMenu.unity
     guid: fc752358bfac7c643a5cd6b07410a387
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/Level1.unity
     guid: f7897e0ed4a3e4e499340215376199b8
+  - enabled: 1
+    path: Assets/Scenes/WFCScene.unity
+    guid: 81eddc66f9c42214186cc764b9d878e1
   m_configObjects: {}

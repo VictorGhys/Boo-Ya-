@@ -23,7 +23,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8973731264468777176}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: BathroomDoorFrameWall_PF
   m_TagString: Untagged
   m_Icon: {fileID: 0}

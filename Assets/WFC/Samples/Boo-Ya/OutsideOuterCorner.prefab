@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7457140352631793657}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: OutsideOuterCorner
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -38,9 +38,17 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 7457140352631793657}
     m_Modifications:
+    - target: {fileID: 2203095962563244662, guid: a69774a7ca6fd744388e200f302c6682, type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
     - target: {fileID: 5633097613710589910, guid: a69774a7ca6fd744388e200f302c6682, type: 3}
       propertyPath: m_Name
       value: OutsideOuterCornerPiece_PF
+      objectReference: {fileID: 0}
+    - target: {fileID: 5633097613710589910, guid: a69774a7ca6fd744388e200f302c6682, type: 3}
+      propertyPath: m_Layer
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 6452055955707283566, guid: a69774a7ca6fd744388e200f302c6682, type: 3}
       propertyPath: m_RootOrder
