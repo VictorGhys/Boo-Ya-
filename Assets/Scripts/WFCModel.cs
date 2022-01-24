@@ -91,11 +91,10 @@ public abstract class WFCModel: MonoBehaviour
     protected abstract void BuildPropagator();
     protected abstract bool OnBoundary(int x, int y);
     protected abstract int GetTileIndex(int t);
-    protected abstract void CreateEmptyBorderPiece(int x, int y);
+    protected abstract void CreatePiece(int x, int y, int chosenPattern);
 
     void Start()
     {
-        //Generate();
     }
 
     void Update()
@@ -110,28 +109,9 @@ public abstract class WFCModel: MonoBehaviour
         _currentRetry = 0;
 
         StartCoroutine(Run(Succes, Failed));
-
-        //int r = _retries;
-        //while (r > 0)
-        //{
-        //    Clear();
-        //    //bool result = Run();
-            
-        //    //if (result)
-        //    //{
-        //    //    OutputObservations();
-        //    //    Debug.Log("WFC finished successfully!");
-        //    //    break;
-        //    //}
-        //    //else
-        //    //{
-        //    //    Debug.LogWarning("WFC failed! :(");
-        //    //    r--;
-        //    //}
-        //}
     }
 
-    private void SetUp()
+    public void SetUp()
     {
         PatternsFromSample();
         BuildPropagator();
@@ -237,31 +217,7 @@ public abstract class WFCModel: MonoBehaviour
         }
         Debug.Log("limit reached!");
     }
-
-    //bool Run()
-    //{
-    //    if (_seed == 0)
-    //        _random = new System.Random();
-    //    else
-    //        _random = new System.Random(_seed);
-
-    //    for ( int l = 0; l < _limit || _limit == 0; l++)
-    //    {
-    //        bool? result = Observe();
-    //        if (result != null)
-    //            return (bool)result;
-    //        else
-    //            Propagate();
-            
-    //        if (_showProcess)
-    //        {
-                
-    //        }
-    //    }
-    //    Debug.Log("limit reached!");
-    //    return true;
-    //}
-
+    
     bool? Observe()
     {
         int? node = FindLowestEntropy();
@@ -478,7 +434,7 @@ public abstract class WFCModel: MonoBehaviour
             {
                 for (int y = 0; y < _height; y++)
                 {
-                    CreateEmptyBorderPiece(x, y);
+                    CreatePiece(x, y, 0);
                 }
             }
             Propagate();
@@ -626,6 +582,11 @@ public abstract class WFCModel: MonoBehaviour
         Gizmos.color = Color.magenta;
         Gizmos.DrawWireCube( new Vector3(_width/2f, 0f, _height/2f), new Vector3(_width, 1, _height));
     }
+
+    public bool GetIsSetupDone()
+    {
+        return _setupDone;
+    }
 }
 
 
@@ -642,9 +603,17 @@ public class WFCEditor : Editor
 
     public override void OnInspectorGUI()
     {
-        if (GUILayout.Button("GENERATE"))
+        if (GUILayout.Button("SetUp"))
         {
-            me.Generate();
+            me.SetUp();
+        }
+
+        if (me.GetIsSetupDone())
+        {
+            if (GUILayout.Button("GENERATE"))
+            {
+                me.Generate();
+            }
         }
         
         DrawDefaultInspector();

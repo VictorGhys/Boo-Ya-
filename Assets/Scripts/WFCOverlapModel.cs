@@ -244,9 +244,8 @@ public class WFCOverlapModel : WFCModel
         return _patterns[t][0];
     }
 
-    protected override void CreateEmptyBorderPiece(int x, int y)
+    protected override void CreatePiece(int x, int y, int chosenPattern)
     {
-        const int chosenPattern = 0;
         int node = x + y * _width;
         bool[] w = _wave[node];
         if (x == 0 || x > _width - _sampleSize || y == 0 || y > _height - _sampleSize)

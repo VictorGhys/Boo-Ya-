@@ -146,11 +146,10 @@ public class WFCSimpleTiledModel : WFCModel
         return t;
     }
 
-    protected override void CreateEmptyBorderPiece(int x, int y)
+    protected override void CreatePiece(int x, int y, int chosenPattern)
     {
         if (x == 0 || y == 0 || x == _width - 1 || y == _height - 1)
         {
-            int chosenPattern = 0;
             int node = x + y * _width;
             bool[] w = _wave[node];
             // Remove all the other possibilities except the chosen pattern
