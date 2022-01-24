@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using UnityEngine;
 using Random = System.Random;
 #if UNITY_EDITOR
@@ -16,6 +17,9 @@ public abstract class WFCModel: MonoBehaviour
 
     [SerializeField, Tooltip("The gameobject containing the output")]
     protected GameObject _output;
+
+    [SerializeField, Tooltip("The gameobject containing a part of a layout to extend")]
+    protected GameObject _toExtend;
 
     [SerializeField, Tooltip("The width of the grid to generate on")]
     protected int _width = 10;
@@ -91,7 +95,8 @@ public abstract class WFCModel: MonoBehaviour
     protected abstract void BuildPropagator();
     protected abstract bool OnBoundary(int x, int y);
     protected abstract int GetTileIndex(int t);
-    protected abstract void CreatePiece(int x, int y, int chosenPattern);
+    protected abstract void CreateEmptyBorderPiece(int x, int y);
+    protected abstract int GetPatternIndex(int t, int x, int y);
 
     void Start()
     {
@@ -124,6 +129,7 @@ public abstract class WFCModel: MonoBehaviour
         OutputObservations();
         Debug.Log("WFC finished successfully!");
     }
+
     private void Failed()
     {
         Debug.LogWarning("WFC failed! :(");
@@ -179,12 +185,12 @@ public abstract class WFCModel: MonoBehaviour
 
     IEnumerator Run(Action onSuccess, Action onFail)
     {
-        Clear();
-
         if (_seed == 0)
             _random = new System.Random();
         else
             _random = new System.Random(_seed);
+
+        Clear();
 
         for (int l = 0; l < _limit || _limit == 0; l++)
         {
@@ -434,10 +440,34 @@ public abstract class WFCModel: MonoBehaviour
             {
                 for (int y = 0; y < _height; y++)
                 {
-                    CreatePiece(x, y, 0);
+                    CreateEmptyBorderPiece(x, y);
                 }
             }
             Propagate();
+        }
+
+        // Create empty border in the output to prevent open rooms at the border
+        if (_toExtend != null)
+        {
+            for (int i = 0; i < _toExtend.transform.childCount; i++)
+            {
+                int x = (int)_toExtend.transform.GetChild(i).localPosition.x;
+                int z = (int)_toExtend.transform.GetChild(i).localPosition.z;
+                string wantedTile = _toExtend.transform.GetChild(i).name;
+                // Get the corresponding tiles prefabs
+                string regexPattern = @"\s*\(.*\)";
+                //Remove the regex pattern from tile.name
+                string nameWithoutThingsInBrackets = Regex.Replace(wantedTile, regexPattern, "");
+                int tileIdx = _tiles.FindIndex(tile => tile == nameWithoutThingsInBrackets);
+                if (tileIdx < 0)
+                    break;
+                int patternIdx = GetPatternIndex(tileIdx, x, z);
+                if (patternIdx >= 0)
+                {
+                    CreatePiece(x, z, patternIdx);
+                    Propagate();
+                }
+            }
         }
     }
 
@@ -512,13 +542,12 @@ public abstract class WFCModel: MonoBehaviour
             int x = i % _width;
             int z = i / _width;
             int prefabIdx = -1;
-            int tileIdx = -1;
             for (int t = 0; t < _nbOfPatterns; t++)
             {
                 if (_wave[x + z * _width][t])
                 {
                     // Find the wanted tile in the tile prefabs
-                    tileIdx = GetTileIndex(t);
+                    int tileIdx = GetTileIndex(t);
                     string wantedTile = _tiles[tileIdx];
                     prefabIdx = _tilesPrefabs.FindIndex(pf => pf.name == wantedTile);
                     if (prefabIdx < 0)
@@ -574,6 +603,22 @@ public abstract class WFCModel: MonoBehaviour
                 }
             }
         }
+    }
+
+    protected void CreatePiece(int x, int y, int chosenPattern)
+    {
+        int node = x + y * _width;
+        bool[] w = _wave[node];
+        if (!w[chosenPattern])
+        {
+            Debug.LogWarning("Create Piece " + chosenPattern + " was going to create a contradiction!");
+            return;
+        }
+
+        // Remove all the other possibilities except the chosen pattern
+        for (int tile = 0; tile < _nbOfPatterns; tile++)
+            if (w[tile] != (tile == chosenPattern))
+                Ban(node, tile);
     }
 
     public void OnDrawGizmos()

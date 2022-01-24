@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System;
 using System.Linq;
+using UnityEditor;
 using UnityEngine;
 
 public class WFCSimpleTiledModel : WFCModel
@@ -145,17 +146,16 @@ public class WFCSimpleTiledModel : WFCModel
     {
         return t;
     }
+     protected override int GetPatternIndex(int t, int x, int z)
+    {
+        return t;
+    }
 
-    protected override void CreatePiece(int x, int y, int chosenPattern)
+    protected override void CreateEmptyBorderPiece(int x, int y)
     {
         if (x == 0 || y == 0 || x == _width - 1 || y == _height - 1)
         {
-            int node = x + y * _width;
-            bool[] w = _wave[node];
-            // Remove all the other possibilities except the chosen pattern
-            for (int tile = 0; tile < _nbOfPatterns; tile++)
-                if (w[tile] != (tile == chosenPattern))
-                    Ban(node, tile);
+            CreatePiece(x, y, 0);
         }
     }
 }

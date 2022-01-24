@@ -29,7 +29,7 @@ public class WFCOverlapModel : WFCModel
 
     // Holds the indexes of tiles for every position on the grid x,z
     private byte[,] _sample;
-    // The patterns of tiles
+    // The patterns of tiles, Indexes in order: Index, Tile index in pattern
     private byte[][] _patterns;
     private long nbOfTilesPow;
 
@@ -189,8 +189,9 @@ public class WFCOverlapModel : WFCModel
 
     long Index(byte[] pattern)
     {
-        long result = 0, power = 1;
-        for (int i = 0; i<pattern.Length; i++)
+        long result = 0;
+        long power = 1;
+        for (int i = 0; i < pattern.Length; i++)
         {
             result += pattern[pattern.Length - 1 - i] * power;
             power *= _nbOfTiles;
@@ -244,18 +245,31 @@ public class WFCOverlapModel : WFCModel
         return _patterns[t][0];
     }
 
-    protected override void CreatePiece(int x, int y, int chosenPattern)
+    protected override int GetPatternIndex(int t, int x, int y)
     {
-        int node = x + y * _width;
-        bool[] w = _wave[node];
-        if (x == 0 || x > _width - _sampleSize || y == 0 || y > _height - _sampleSize)
+        List<int> validIndices = new List<int>();
+        // Get a random pattern index with t in it
+        for (int i = 0; i < _patterns.Length; i++)
         {
-            for (int tile = 0; tile < _nbOfPatterns; tile++)
-                if (w[tile] != (tile == chosenPattern))
-                    Ban(node, tile);
+            if(_patterns[i][0] == t && _wave[x + y * _width][i])
+                validIndices.Add(i);
         }
+
+        if (validIndices.Count <= 0)
+            return -1;
+
+        int randIdx = _random.Next(validIndices.Count);
+        return validIndices[randIdx];
     }
 
+    protected override void CreateEmptyBorderPiece(int x, int y)
+    {
+        if (x == 0 || x > _width - _sampleSize || y == 0 || y > _height - _sampleSize)
+        {
+            CreatePiece(x, y, 0);
+        }
+    }
+    
     public void OnDrawGizmos()
     {
         base.OnDrawGizmos();
