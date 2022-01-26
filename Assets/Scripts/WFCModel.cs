@@ -1,9 +1,12 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading;
 using UnityEngine;
+using Debug = UnityEngine.Debug;
 using Random = System.Random;
 #if UNITY_EDITOR
 using UnityEditor;
@@ -41,6 +44,12 @@ public abstract class WFCModel: MonoBehaviour
 
     [SerializeField, Tooltip("Time to wait between steps of the process")]
     private float _showWaitTime = 0.5f;
+
+    [SerializeField, Tooltip("Whether or not to show debug visualization")]
+    private bool _showDebugVisualization = true;
+
+    [SerializeField, Tooltip("The amount of times to run the algorithm")]
+    private int _timesToRun = 1;
 
     protected int _limit = 100;
     
@@ -81,6 +90,7 @@ public abstract class WFCModel: MonoBehaviour
     protected int[] _correspondingPrefabTiles;
     protected GameObject[][] _interimResults;
     protected bool _isOverlappingModel = false;
+    protected int _timesFailed;
 
     // Direction and offsets for quick convertion to neighbours
     protected enum Direction : int
@@ -112,8 +122,30 @@ public abstract class WFCModel: MonoBehaviour
             SetUp();
 
         _currentRetry = 0;
+        _timesFailed = 0;
 
-        StartCoroutine(Run(Succes, Failed));
+        List<float> times = new List<float>();
+        
+        for (int i = 0; i < _timesToRun; i++)
+        {
+            var stopwatch = Stopwatch.StartNew();
+            StartCoroutine(Run(Success, Failed));
+            stopwatch.Stop();
+            times.Add(stopwatch.ElapsedMilliseconds);
+        }
+
+        // Remove lowest and highest times
+        if (times.Count > 2)
+        {
+            times.Sort();
+            times.RemoveAt(_timesToRun - 1);
+            times.RemoveAt(0);
+        }
+
+        float average = times.Average();
+        Debug.Log(_width + " Algorithm took " + average + " milliseconds");
+        Debug.Log(_width + " Algorithm failed " + _timesFailed + " times");
+
     }
 
     public void SetUp()
@@ -124,7 +156,7 @@ public abstract class WFCModel: MonoBehaviour
         _setupDone = true;
     }
 
-    private void Succes()
+    private void Success()
     {
         OutputObservations();
         Debug.Log("WFC finished successfully!");
@@ -205,10 +237,11 @@ public abstract class WFCModel: MonoBehaviour
                 else
                 {
                     onFail();
+                    _timesFailed++;
                     if (_currentRetry < _retries)
                     {
                         _currentRetry++;
-                        StartCoroutine(Run(Succes, Failed));
+                        StartCoroutine(Run(Success, Failed));
                     }
                     yield break;
                 }
@@ -374,7 +407,8 @@ public abstract class WFCModel: MonoBehaviour
         if (_sumOfPossibilities[i] == 0 && !_failed)
         {
             _failed = true;
-            DumpWave(i, t);
+            if(_showDebugVisualization)
+                DumpWave(i, t);
         }
 
         _sumsOfWeights[i] -= _weights[t];

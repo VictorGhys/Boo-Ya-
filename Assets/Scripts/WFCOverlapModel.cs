@@ -15,8 +15,11 @@ public class WFCOverlapModel : WFCModel
     private int _sampleAreaWidth = 5;
     [SerializeField, Tooltip("The height of the grid to sample from")]
     private int _sampleAreaHeight = 5;
-    [SerializeField, Tooltip("The height of the grid to sample from")]
+    [SerializeField, Tooltip("The custom weight for the pattern that is all empty")]
     private double _customWeightEmpty = 0;
+
+    [SerializeField, Tooltip("The custom weight for the pattern that is all room floor")]
+    private double _customWeightRoomFloor = 0;
     
     [SerializeField, Tooltip("The kind of symmetry that is used on the patterns derived from the input")]
     private Symmetry _symmetry = Symmetry.AllSymmetry;
@@ -223,13 +226,6 @@ public class WFCOverlapModel : WFCModel
                 ps[5] = ReflectRemapTiles(Reflect(ps[4]));
                 ps[6] = RotateRemapTiles(Rotate(ps[4]));
                 ps[7] = ReflectRemapTiles(Reflect(ps[6]));
-                //ps[1] = Reflect(ps[0]);
-                //ps[2] = Rotate(ps[0]);
-                //ps[3] = Reflect(ps[2]);
-                //ps[4] = Rotate(ps[2]);
-                //ps[5] = Reflect(ps[4]);
-                //ps[6] = Rotate(ps[4]);
-                //ps[7] = Reflect(ps[6]);
 
                 for (int k = 0; k < (int) _symmetry; k++)
                 {
@@ -263,8 +259,35 @@ public class WFCOverlapModel : WFCModel
             _weights[0] = _customWeightEmpty;
         }
 
+        // Set the weight of the room floor pattern to a custom one
+        if (_customWeightRoomFloor != 0)
+        {
+            int roomFloorTileIdx = _tiles.FindIndex(t => t == "RoomFloor");
+            if(roomFloorTileIdx < 0)
+                Debug.Log("Can't find RoomFloor");
+            for (int i = 0; i < _patterns.Length; i++)
+            {
+                bool isAllRoomFloor = true;
+                for (int p = 0; p < _sampleSize * _sampleSize; p++)
+                {
+                    if (_patterns[i][p] != roomFloorTileIdx)
+                    {
+                        isAllRoomFloor = false;
+                        break;
+                    }
+                }
+
+                if (isAllRoomFloor)
+                {
+                    _weights[i] = _customWeightRoomFloor;
+                    break;
+                }
+            }
+        }
+
         // Set up propagator
         _propagator = new int[4][][];
+        int doomedPatternsCount = 0;
         for (int d = 0; d < 4; d++)
         {
             _propagator[d] = new int[_nbOfPatterns][];
@@ -277,7 +300,8 @@ public class WFCOverlapModel : WFCModel
                 _propagator[d][t] = new int[list.Count];
                 if (list.Count == 0)
                 {
-                    Debug.LogWarning("doomed pattern");
+                    doomedPatternsCount++;
+                    Debug.LogWarning("doomed pattern " + doomedPatternsCount);
                 }
                 for (int c = 0; c < list.Count; c++)
                     _propagator[d][t][c] = list[c];
